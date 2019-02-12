@@ -9,13 +9,13 @@ from application import app, db
 import time
 
 
-@route_account.route("/showcostomer/")
-def showcostomer():
+@route_account.route("/showcustomer/", methods=['POST'])
+def showcustomer():
     resp = {'code': 200, 'msg': '操作成功~', 'data': {}}
     req = request.values
 
     page = int(req['page']) if 'page' in req else 1
-    Cidentity = int(req['Cidentity']) if 'Cidentity' in req else 2
+    Cidentity = int(req['Cidentity']) if 'Cidentity' in req else -1
     info = str(req['mix_kw']) if 'mix_kw' in req else ''
 
     if page < 1:
@@ -24,16 +24,16 @@ def showcostomer():
     page_size = 10
     offset = (page - 1) * page_size
     query = Customer.query.filter_by()
-    if Cidentity:
+    if Cidentity != -1 and Cidentity:
         query = Customer.query.filter_by(Cidentity=Cidentity)
 
     if info:
-        rule = or_(Customer.CustomerName.ilike("%{0}%".format(info)))
+        rule = or_(Customer.CustomerName.ilike("%{0}%".format(info)), Customer.CustomerPhone.ilike("%{0}%".format(info)))
         query = query.filter(rule)
 
     totalCount = query.count()
 
-    apply_list = query.order_by(Customer.C.desc()) \
+    apply_list = query.order_by(Customer.Cid.desc()) \
         .offset(offset).limit(page_size).all()
 
     data_list = []
