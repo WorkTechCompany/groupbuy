@@ -61,3 +61,8 @@ def login():
 
 
     return response
+
+
+@route_user.route("/checkdeploy/", methods=["GET","POST"])
+def checkdeploy():
+    return 'success'
