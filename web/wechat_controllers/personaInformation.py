@@ -3,7 +3,7 @@ from common.models.apply import Apply, db
 from application import app, db
 from flask import request, jsonify
 from common.models.product import Product
-import os
+from sqlalchemy import and_
 from common.models.address import Address
 from common.libs.UrlManager import UrlManager
 
@@ -27,12 +27,13 @@ def persion():
         }
     return jsonify(resp)
 
-
+# 申请商户
 @route_wechat.route("/apply/", methods=['POST'])
 def apply():
 
     resp = {'code': 200, 'msg': '申请成功，将于三个工作日内进行审核~'}
     summnerNote = Apply()
+    summnerNote.Cid = request.values['Cid'] if 'Cid' in request.values else ''
     summnerNote.ShopCategory = request.values['ShopCategory'] if 'ShopCategory' in request.values else ''
     summnerNote.IdentityCard = request.values['IdentityCard'] if 'IdentityCard' in request.values else ''
     summnerNote.IdentityCardHand = request.values['IdentityCardHand'] if 'IdentityCardHand' in request.values else ''
@@ -52,17 +53,13 @@ def apply():
 
     return jsonify(resp)
 
-
+# 展示地址
 @route_wechat.route("/showAddress/", methods=['POST'])
 def showress():
     resp = {'code': 200, 'msg': '查询成功'}
     req = request.values
     Cid = req['Cid']
     result = Address.query.filter_by(Cid=Cid)
-    # if not result:
-    #     resp['code'] = -1
-    #     resp['msg'] = '暂无地址'
-    #     return jsonify(result)
     address_list = []
     for item in result:
         address = {
@@ -81,11 +78,44 @@ def showress():
     resp['data'] = address_list
     return jsonify(resp)
 
+# 修改默认地址
+@route_wechat.route("/editdefault/", methods=['POST'])
+def editdefault():
+    resp = {'code': 200, 'msg': '修改成功~'}
+    Id = request.values['Id'] if 'Id' in request.values else -1
+    Cid = request.values['Cid'] if 'Cid' in request.values else -1
 
+    edit = Address.query.filter(and_(Address.Cid==Cid, Address.Status==1)).first()
+    if edit:
+        edit.Status = 0
 
-@route_wechat.route("/editAddress/", methods=['POST'])
+    default = Address.query.filter_by(Id=Id).first()
+    default.Status = 1
+    db.session.commit()
+    return jsonify(resp)
+
+# 修改地址
+@route_wechat.route("/editAddress/", methods=['GET', 'POST'])
 def editAdress():
     resp = {'code': 200, 'msg': '添加成功~'}
+
+    if request.method == 'GET':
+        resp['msg'] = '查询成功~'
+        Id = request.values['Id'] if 'Id' in request.values else -1
+        result = Address.query.filter_by(Id=Id).first()
+        address = {
+            'id': result.Id,
+            'Cid': result.Cid,
+            'Addressee': result.Addressee,
+            'AddresseePhone': result.AddresseePhone,
+            'Province': result.Province,
+            'City': result.City,
+            'County': result.County,
+            'Details': result.Details,
+            'Status': int(result.Status)
+        }
+        resp['data'] = address
+        return jsonify(resp)
 
     Id = request.values['Id'] if 'Id' in request.values else -1
 
@@ -103,7 +133,7 @@ def editAdress():
     summnerNote.City = request.values['City'] if 'City' in request.values else ''
     summnerNote.County = request.values['County'] if 'County' in request.values else ''
     summnerNote.Details = request.values['Details'] if 'Details' in request.values else ''
-    summnerNote.Status = 0
+    summnerNote.Status = request.values['Status'] if 'Status' in request.values else 0
 
     db.session.add(summnerNote)
     db.session.commit()
@@ -114,6 +144,7 @@ def editAdress():
         resp['msg']= '修改成功~'
         return jsonify(resp)
 
+# 删除地址
 @route_wechat.route('/deleteAddress/', methods=['POST'])
 def deleteproduct():
     resp = {'code': 200, 'msg': '删除成功'}

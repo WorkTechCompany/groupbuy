@@ -1,21 +1,21 @@
 from application import db, app
-from sqlalchemy import Integer, Column, DateTime, String, DECIMAL
+from sqlalchemy import Integer, Column, DateTime, String, DECIMAL, TEXT
 from sqlalchemy.schema import FetchedValue
 
 
 class Shop(db.Model):
     __tablename__ = 'shop'
 
-    Id = db.Column(db.BigInteger, primary_key=True)                                                        # id号码
-    ShopId = db.Column(db.BigInteger, primary_key=True)                                                    # 商户ID
+    ShopId = db.Column(db.BigInteger, primary_key=True)                                                    # 商店ID
+    Aid = db.Column(db.BigInteger, nullable=False, server_default=db.FetchedValue())                       # 商户ID
     ShopName = db.Column(db.String(100), nullable=False, server_default=db.FetchedValue())                 # 商户名称
-    ProductMerchanName = db.Column(db.String(20), nullable=False, server_default=db.FetchedValue())        # 商品店主名字
     ShopImage = db.Column(db.String(100), nullable=False, server_default=db.FetchedValue())                # 商户图片
-    ShopInfo = db.Column(db.String(1000), nullable=False, server_default=db.FetchedValue())                # 商户信息
+    ShopCategory = db.Column(db.BigInteger, nullable=False, server_default=db.FetchedValue())             # 店铺分类
+    ShopProvince = db.Column(db.String(100), nullable=False, server_default=db.FetchedValue())             # 省
+    ShopCity = db.Column(db.String(100), nullable=False, server_default=db.FetchedValue())                 # 市
+    ShopCountry = db.Column(db.String(100), nullable=False, server_default=db.FetchedValue())              # 地区
+    # ShopInfo = db.Column(TEXT, nullable=False, server_default=db.FetchedValue())                           # 商户信息
     # ShopStatus = db.Column(Integer, nullable=False, server_default=db.FetchedValue())                      # 商户状态  1为已过审
-
-
-
 
 
 

@@ -6,6 +6,7 @@ from common.models.User import User
 from sqlalchemy import or_
 from application import app, db
 
+# 管理员
 @route_account.route("/user/")
 def user():
     resq = {}

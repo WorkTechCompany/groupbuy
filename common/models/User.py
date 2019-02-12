@@ -5,6 +5,7 @@ class User(db.Model):
     __tablename__ = 'user'
 
     uid = db.Column(db.BigInteger, primary_key=True)                                                        # 用户uid
+    Aid = db.Column(db.Integer, nullable=False, server_default=db.FetchedValue())                           # 商户Aid
     nickname = db.Column(db.String(100), nullable=False, server_default=db.FetchedValue())                  # 用户名
     mobile = db.Column(db.String(20), nullable=False, server_default=db.FetchedValue())                     # 手机号码
     email = db.Column(db.String(100), nullable=False, server_default=db.FetchedValue())                     # 邮箱地址

@@ -2,6 +2,7 @@ from flask import request, jsonify
 from common.models.product import Product
 from sqlalchemy import or_
 from web.wechat_controllers import route_wechat
+import json
 
 @route_wechat.route("/home/", methods=['GET', 'POST'])
 def home():
@@ -22,19 +23,21 @@ def home():
         rule = or_(Product.ShopName.ilike("%{0}%".format(info)))
         query = query.filter(rule)
 
-    shop_list = query.order_by(Product.Id.desc()) \
+    shop_list = query.order_by(Product.PId.desc()) \
         .offset(offset).limit(page_size).all()
 
     data_food_list = []
     if shop_list:
         for item in shop_list:
+            price = json.loads(item.ProductFormat)[0]['price']
+            stock = json.loads(item.ProductFormat)[0]['stock']
             tmp_data = {
-                'id': item.Id,
+                'PId': item.PId,
                 'ProductName': "%s" % (item.ProductName),
-                'ProductMerchantId': "%s" % (item.ProductMerchantId),
-                'ProdectPrice': str(item.ProdectPrice),
+                'ShopId': "%s" % (item.ShopId),
+                'ProdectPrice': str(price),
                 'ProductImage': str(item.ProductImage),
-                'ProductStock': int(item.ProductStock),
+                'ProductStock': int(stock),
                 'ProductSold': str(item.ProductSold)
             }
             data_food_list.append(tmp_data)
@@ -47,23 +50,34 @@ def productInfo():
     resp = {'code': 200, 'msg': '操作成功~', 'data': {}}
     req = request.values
 
-    id = int(req['id']) if 'id' in req else 1
+    PId = int(req['PId']) if 'PId' in req else -1
 
-    productinfo = Product.query.filter_by(Id=id).first()
+    productinfo = Product.query.filter_by(PId=PId).first()
 
-    data_food_list = []
     if productinfo:
         tmp_data = {
-            'id': productinfo.Id,
+            'PId': productinfo.PId,
             'ProductName': "%s" % (productinfo.ProductName),
-            'ProductMerchantId': "%s" % (productinfo.ProductMerchantId),
+            'ShopId': "%s" % (productinfo.ShopId),
             'ProductMerchanName': "%s" % (productinfo.ProductMerchanName),
             'ProductInfo': "%s" % (productinfo.ProductInfo),
-            'ProdectPrice': str(productinfo.ProdectPrice),
+            'ProductFormat': str(productinfo.ProductFormat),
             'ProductImage': str(productinfo.ProductImage),
-            'ProductStock': int(productinfo.ProductStock),
             'ProductSold': str(productinfo.ProductSold)
         }
-        data_food_list.append(tmp_data)
-    resp['data'] = data_food_list
+        resp['data'] = tmp_data
     return jsonify(resp)
+    # PId = db.Column(db.BigInteger, primary_key=True)                                                        # 商品ID
+    # ProductName = db.Column(db.String(100), nullable=False, server_default=db.FetchedValue())              # 商品名称
+    # ShopId = db.Column(db.BigInteger, nullable=False, server_default=db.FetchedValue())                     # 商店ID
+    # AId = db.Column(db.BigInteger, nullable=False, server_default=db.FetchedValue())                        # 商户ID
+    # ProductMerchanName = db.Column(db.String(20), nullable=False, server_default=db.FetchedValue())        # 商品店主名字
+    # ProductCategory = db.Column(db.String(20), nullable=False, server_default=db.FetchedValue())           # 商品分类
+    # ProductInfo = db.Column(db.String(5000), nullable=False, server_default=db.FetchedValue())             # 商品信息
+    # ProductSold = db.Column(Integer, nullable=False, server_default=db.FetchedValue())                     # 商品已售数
+    # ProductFormat = db.Column(db.String(20), nullable=False, server_default=db.FetchedValue())           # 商品规格
+    # ProductImage = db.Column(db.String(20), nullable=False, server_default=db.FetchedValue())           # 商品图片
+    # ProductAttributes = db.Column(db.BigInteger, nullable=False, server_default=db.FetchedValue())      # 销售属性
+    # ProductProvince = db.Column(db.String(100), nullable=False, server_default=db.FetchedValue())            # 省份
+    # ProductCity = db.Column(db.String(100), nullable=False, server_default=db.FetchedValue())                # 市区
+    # ProductCountry = db.Column(db.String(100), nullable=False, server_default=db.FetchedValue())               # 县

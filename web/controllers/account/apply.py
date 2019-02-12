@@ -7,24 +7,26 @@ import os
 from application import app, db
 import time
 
-
+# 商户申请显示
 @route_account.route("/showapply/", methods=['POST'])
 def showapply():
     resp = {'code': 200, 'msg': '操作成功~', 'data': {}}
     req = request.values
 
     page = int(req['page']) if 'page' in req else 1
-    Status = int(req['Status']) if 'Status' in req else 2
+    ApplyStatus = int(req['ApplyStatus']) if 'ApplyStatus' in req else 2
 
     if page < 1:
         page = 1
 
     page_size = 10
     offset = (page - 1) * page_size
-    if Status == 2:
+    if ApplyStatus == 2:
         query = Apply.query.filter_by()
     else:
-        query = Apply.query.filter_by(Status=Status)
+        query = Apply.query.filter_by(ApplyStatus=ApplyStatus)
+
+    totalCount = query.count()
 
     apply_list = query.order_by(Apply.Aid.desc()) \
         .offset(offset).limit(page_size).all()
@@ -49,13 +51,15 @@ def showapply():
                 'ApplyStatus': int(item.ApplyStatus),
             }
             data_list.append(tmp_data)
+    resp['totalCount'] = totalCount
     resp['data']['list'] = data_list
     resp['data']['has_more'] = 0 if len(data_list) < page_size else 1
     response = jsonify(resp)
     response.headers['Access-Control-Allow-Origin'] = '*'
     return response
 
-@route_account.route('changestatus', methods=['GET', 'POST'])
+# 商户申请审核
+@route_account.route("/changestatus/", methods=['POST'])
 def changestatus():
     resp = {'code': 200, 'msg': '操作成功'}
 
@@ -64,10 +68,12 @@ def changestatus():
     result = Apply.query.filter_by(Aid=Aid).first()
     result.ApplyStatus = int(ApplyStatus)
     db.session.commit()
-    return jsonify(resp)
+    response = jsonify(resp)
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    return response
 
 
-
+# 商户申请删除
 @route_account.route('/deleteapply/', methods=['GET', 'POST'])
 def edditstatus():
     resp = {'code': 200, 'msg': '操作成功'}

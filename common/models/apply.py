@@ -14,8 +14,8 @@ class Apply(db.Model):
     Contract = db.Column(db.String(500), nullable=False, server_default=db.FetchedValue())                        # 合同
     IDCard = db.Column(db.String(100), nullable=False, server_default=db.FetchedValue())                   # 身份证号码（户名）
     ApplyProvince = db.Column(db.String(100), nullable=False, server_default=db.FetchedValue())            # 省份
-    ApplyCity = db.Column(db.String(20), primary_key=True)                                                 # 市区
-    ApplyCounty = db.Column(db.String(20), nullable=False, server_default=db.FetchedValue())               # 县
+    ApplyCity = db.Column(db.String(100), nullable=False, server_default=db.FetchedValue())                  # 市区
+    ApplyCounty = db.Column(db.String(100), nullable=False, server_default=db.FetchedValue())               # 县
     ApplyDetails = db.Column(db.String(100), nullable=False, server_default=db.FetchedValue())             # 地址详细
     ApplyPhone  = db.Column(Integer, nullable=False, unique=True, server_default=db.FetchedValue())        # 手机号（工号）
     ApplyPassword = db.Column(Integer, nullable=False, server_default=db.FetchedValue())                   # 密码
