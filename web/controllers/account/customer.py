@@ -53,29 +53,3 @@ def showcustomer():
     response.headers['Access-Control-Allow-Origin'] = '*'
     return response
 
-
-# @route_account.route("/shopedit/", methods=['POST'])
-# def shopedit():
-#
-#     resp = {'code': 200, 'msg': '操作成功~'}
-#     ShopId = request.values['ShopId'] if 'ShopId' in request.values else -1
-#
-#     summnerNote = Shop()
-#
-#     if ShopId != -1 and ShopId:
-#         summnerNote = Shop.query.filter_by(ShopId=ShopId).first()
-#
-#     summnerNote.Aid = request.values['Aid'] if 'Aid' in request.values else ''
-#     summnerNote.ShopName = request.values['ShopName'] if 'ShopName' in request.values else ''
-#     summnerNote.ShopCategory = request.values['ShopCategory'] if 'ShopCategory' in request.values else ''
-#     summnerNote.ShopProvince = request.values['ShopProvince'] if 'ShopProvince' in request.values else ''
-#     summnerNote.ShopCity = request.values['ShopCity'] if 'ShopCity' in request.values else ''
-#     summnerNote.ShopCountry = request.values['ShopCountry'] if 'ShopCountry' in request.values else ''
-#     summnerNote.ShopImage = request.values['ShopImage'] if 'ShopImage' in request.values else ''
-#
-#     db.session.add(summnerNote)
-#     db.session.commit()
-#
-#     response = jsonify(resp)
-#     response.headers['Access-Control-Allow-Origin'] = '*'
-#     return response

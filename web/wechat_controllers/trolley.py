@@ -19,7 +19,7 @@ def showtrolley():
     tmp_list = []
     for item in result:
         tmp_data = {
-            'id': item.id,
+            'Id': item.Id,
             'ShopId': item.ShopId,
             'ShopName': item.ShopName,
             'ProductName': item.ProductName,
@@ -33,7 +33,6 @@ def showtrolley():
 
     return jsonify(resp)
 
-
 @route_wechat.route("/addtrolley/", methods=['GET', 'POST'])
 def addtrolley():
     resp = {'code': 200, 'msg': '添加成功'}
@@ -45,7 +44,7 @@ def addtrolley():
     summnerNote.ShopName = request.values['ShopName'] if 'ShopName' in request.values else ''
     summnerNote.ProductName = request.values['ProductName'] if 'ProductName' in request.values else ''
     summnerNote.Count = request.values['Count'] if 'Count' in request.values else ''
-    summnerNote.ProdectPrice = request.values['ProdectPrice'] if 'ProdectPrice' in request.values else ''
+    summnerNote.ProductPrice = request.values['ProdectPrice'] if 'ProdectPrice' in request.values else ''
     summnerNote.ProductFormat = request.values['ProductFormat'] if 'ProductFormat' in request.values else ''
 
     db.session.add(summnerNote)

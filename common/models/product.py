@@ -14,6 +14,7 @@ class Product(db.Model):
     ProductCategory = db.Column(db.String(20), nullable=False, server_default=db.FetchedValue())           # 商品分类
     ProductInfo = db.Column(db.String(5000), nullable=False, server_default=db.FetchedValue())             # 商品信息
     ProductSold = db.Column(Integer, nullable=False, server_default=db.FetchedValue())                     # 商品已售数
+    Productsku = db.Column(db.String(20), nullable=False, server_default=db.FetchedValue())           # 商品规格
     ProductFormat = db.Column(db.String(20), nullable=False, server_default=db.FetchedValue())           # 商品规格
     ProductImage = db.Column(db.String(20), nullable=False, server_default=db.FetchedValue())           # 商品图片
     ProductAttributes = db.Column(db.BigInteger, nullable=False, server_default=db.FetchedValue())      # 销售属性

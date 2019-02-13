@@ -17,6 +17,7 @@ class Apply(db.Model):
     ApplyCity = db.Column(db.String(100), nullable=False, server_default=db.FetchedValue())                  # 市区
     ApplyCounty = db.Column(db.String(100), nullable=False, server_default=db.FetchedValue())               # 县
     ApplyDetails = db.Column(db.String(100), nullable=False, server_default=db.FetchedValue())             # 地址详细
-    ApplyPhone  = db.Column(Integer, nullable=False, unique=True, server_default=db.FetchedValue())        # 手机号（工号）
-    ApplyPassword = db.Column(Integer, nullable=False, server_default=db.FetchedValue())                   # 密码
+    ApplyPhone = db.Column(Integer, nullable=False, unique=True, server_default=db.FetchedValue())        # 手机号（工号）
+    ApplyPassword = db.Column(db.String(100), nullable=False, server_default=db.FetchedValue())             # 密码
+    Applylogin_salt = db.Column(db.String(100), nullable=False, server_default=db.FetchedValue())            # 密码的随机加密秘钥
     ApplyStatus = db.Column(Integer, nullable=False, server_default=db.FetchedValue())                     # 审核状态  1为已过审

@@ -77,6 +77,7 @@ def productedit():
                 'ShopId': "%s" % (result.ShopId),
                 'ProductCategory': str(result.ProductCategory),
                 'ProductImage': str(result.ProductImage),
+                'Productsku': str(result.Productsku),
                 'ProductFormat': str(result.ProductFormat),
                 'ProductInfo': str(result.ProductInfo),
                 'ProductAttributes': str(result.ProductAttributes),
@@ -97,6 +98,7 @@ def productedit():
     summnerNote.ProductName = request.values['ProductName'] if 'ProductName' in request.values else ''
     summnerNote.ProductCategory = request.values['ProductCategory'] if 'ProductCategory' in request.values else ''
     summnerNote.ProductInfo = request.values['ProductInfo'] if 'ProductInfo' in request.values else ''
+    summnerNote.Productsku = request.values['Productsku'] if 'Productsku' in request.values else ''
     summnerNote.ProductFormat = request.values['ProductFormat'] if 'ProductFormat' in request.values else ''
     summnerNote.ProductImage = request.values['ProductImage'] if 'ProductImage' in request.values else ''
     summnerNote.ProductAttributes = request.values['ProductAttributes'] if 'ProductAttributes' in request.values else ''
@@ -126,6 +128,7 @@ def addproduct():
         'ProductMerchanName'] if 'ProductMerchanName' in request.values else '胡桃夹子'
     summnerNote.ProductCategory = request.values['ProductCategory'] if 'ProductCategory' in request.values else ''
     summnerNote.ProductInfo = request.values['ProductInfo'] if 'ProductInfo' in request.values else ''
+    summnerNote.Productsku = request.values['Productsku'] if 'Productsku' in request.values else ''
     summnerNote.ProductFormat = request.values['ProductFormat'] if 'ProductFormat' in request.values else ''
     summnerNote.ProductImage = request.values['ProductImage'] if 'ProductImage' in request.values else ''
     summnerNote.ProductAttributes = request.values['ProductAttributes'] if 'ProductAttributes' in request.values else ''

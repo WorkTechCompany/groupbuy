@@ -1,6 +1,7 @@
 from web.controllers.account import route_account
 from flask import jsonify, request
 from common.models.apply import Apply
+from common.models.customer import Customer
 from common.libs.UrlManager import UrlManager
 from sqlalchemy import or_
 import os
@@ -67,6 +68,11 @@ def changestatus():
     ApplyStatus = request.values['ApplyStatus'] if 'ApplyStatus' in request.values else 0
     result = Apply.query.filter_by(Aid=Aid).first()
     result.ApplyStatus = int(ApplyStatus)
+
+    Cid = result.Cid
+    result = Customer.query.filter_by(Cid=Cid).first()
+    result.Cidentity = 2
+
     db.session.commit()
     response = jsonify(resp)
     response.headers['Access-Control-Allow-Origin'] = '*'

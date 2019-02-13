@@ -24,27 +24,27 @@ def placeorder():
     db.session.commit()
 
     return jsonify(resp)
-
-@route_wechat.route("/showorder/", methods=['GET', 'POST'])
-def showorder():
-
-    resp = {'code': 200, 'msg': '查询成功'}
-    req = request.values
-    Cid = req['Cid']
-    orders = Order.query.filter_by(Cid=Cid).all
-    order_list = []
-    for order in orders:
-        result = {
-            'Cid': Cid,
-            'CustomerName': order.CustomerName,
-            'CustomerPhone': order.CustomerPhone,
-            'MyBalance': str(order.MyBalance),
-            'AvailableBalance': order.AvailableBalance,
-            "MyIncome": order.MyIncome
-        }
-        order_list.append(result)
-    resp['order_list'] = order_list
-    return jsonify(resp)
+#
+# @route_wechat.route("/showorder/", methods=['GET', 'POST'])
+# def showorder():
+#
+#     resp = {'code': 200, 'msg': '查询成功'}
+#     req = request.values
+#     Cid = req['Cid']
+#     orders = Order.query.filter_by(Cid=Cid).all
+#     order_list = []
+#     for order in orders:
+#         result = {
+#             'Cid': Cid,
+#             'CustomerName': order.CustomerName,
+#             'CustomerPhone': order.CustomerPhone,
+#             'MyBalance': str(order.MyBalance),
+#             'AvailableBalance': order.AvailableBalance,
+#             "MyIncome": order.MyIncome
+#         }
+#         order_list.append(result)
+#     resp['order_list'] = order_list
+#     return jsonify(resp)
 
 
 

@@ -3,9 +3,9 @@ from common.models.apply import Apply, db
 from application import app, db
 from flask import request, jsonify
 from common.models.product import Product
+from common.libs.user.UserService import UserService
 from sqlalchemy import and_
 from common.models.address import Address
-from common.libs.UrlManager import UrlManager
 
 
 @route_wechat.route("/persion/", methods=['GET', 'POST'])
@@ -31,6 +31,8 @@ def persion():
 @route_wechat.route("/apply/", methods=['POST'])
 def apply():
 
+    default_pwd = "********"
+
     resp = {'code': 200, 'msg': '申请成功，将于三个工作日内进行审核~'}
     summnerNote = Apply()
     summnerNote.Cid = request.values['Cid'] if 'Cid' in request.values else ''
@@ -45,7 +47,12 @@ def apply():
     summnerNote.ApplyCounty = request.values['ApplyCounty'] if 'ApplyCounty' in request.values else ''
     summnerNote.ApplyDetails = request.values['ApplyDetails'] if 'ApplyDetails' in request.values else ''
     summnerNote.ApplyPhone = request.values['ApplyPhone'] if 'ApplyPhone' in request.values else ''
-    summnerNote.ApplyPassword = request.values['ApplyPassword'] if 'ApplyPassword' in request.values else ''
+
+    summnerNote.Applylogin_salt = UserService.geneSalt()
+    ApplyPassword = request['ApplyPassword'] if 'ApplyPassword' in request else ''
+    if default_pwd != ApplyPassword:
+        summnerNote.ApplyPassword = UserService.genePwd(ApplyPassword, summnerNote.login_salt)
+
     summnerNote.ShopStatus = 0
 
     db.session.add(summnerNote)
