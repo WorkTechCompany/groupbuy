@@ -35,7 +35,7 @@ def apply():
 
     resp = {'code': 200, 'msg': '申请成功，将于三个工作日内进行审核~'}
     summnerNote = Apply()
-    summnerNote.Cid = request.values['Cid'] if 'Cid' in request.values else ''
+    summnerNote.Cid = int(request.values['Cid']) if 'Cid' in request.values else -1
     summnerNote.ShopCategory = request.values['ShopCategory'] if 'ShopCategory' in request.values else ''
     summnerNote.IdentityCard = request.values['IdentityCard'] if 'IdentityCard' in request.values else ''
     summnerNote.IdentityCardHand = request.values['IdentityCardHand'] if 'IdentityCardHand' in request.values else ''
@@ -49,16 +49,37 @@ def apply():
     summnerNote.ApplyPhone = request.values['ApplyPhone'] if 'ApplyPhone' in request.values else ''
 
     summnerNote.Applylogin_salt = UserService.geneSalt()
-    ApplyPassword = request['ApplyPassword'] if 'ApplyPassword' in request else ''
+    ApplyPassword = request.values['ApplyPassword'] if 'ApplyPassword' in request.values else ''
     if default_pwd != ApplyPassword:
-        summnerNote.ApplyPassword = UserService.genePwd(ApplyPassword, summnerNote.login_salt)
+        summnerNote.ApplyPassword = UserService.genePwd(ApplyPassword, summnerNote.Applylogin_salt)
 
-    summnerNote.ShopStatus = 0
+    summnerNote.ApplyStatus = 0
 
     db.session.add(summnerNote)
     db.session.commit()
 
     return jsonify(resp)
+
+# 申请商户
+@route_wechat.route("/checkapply/")
+def checkapply():
+
+    resp = {'code': 200, 'msg': '审核通过，请登录后台管理系统进行操作'}
+    req = request.values
+    #
+    Cid = req['Cid']
+    info = Apply.query.filter_by(Cid=Cid).first()
+
+    if info.ApplyStatus == 1:
+        return jsonify(resp)
+    if info.ApplyStatus == 0:
+        resp['code'] = 201
+        resp['msg'] = '审核处理中，请稍后查询'
+        return jsonify(resp)
+    if info.ApplyStatus == -1:
+        resp['code'] = -1
+        resp['msg'] = '审核未通过'
+        return jsonify(resp)
 
 # 展示地址
 @route_wechat.route("/showAddress/", methods=['POST'])

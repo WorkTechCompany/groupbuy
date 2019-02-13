@@ -96,7 +96,7 @@ def productedit():
         summnerNote = Product.query.filter_by(PId=PId).first()
 
     summnerNote.ProductName = request.values['ProductName'] if 'ProductName' in request.values else ''
-    summnerNote.ProductCategory = request.values['ProductCategory'] if 'ProductCategory' in request.values else ''
+    summnerNote.ProductCategory = int(request.values['ProductCategory']) if 'ProductCategory' in request.values else ''
     summnerNote.ProductInfo = request.values['ProductInfo'] if 'ProductInfo' in request.values else ''
     summnerNote.Productsku = request.values['Productsku'] if 'Productsku' in request.values else ''
     summnerNote.ProductFormat = request.values['ProductFormat'] if 'ProductFormat' in request.values else ''
@@ -126,7 +126,7 @@ def addproduct():
     summnerNote.AId = request.values['AId'] if 'AId' in request.values else 1
     summnerNote.ProductMerchanName = request.values[
         'ProductMerchanName'] if 'ProductMerchanName' in request.values else '胡桃夹子'
-    summnerNote.ProductCategory = request.values['ProductCategory'] if 'ProductCategory' in request.values else ''
+    summnerNote.ProductCategory = int(request.values['ProductCategory']) if 'ProductCategory' in request.values else ''
     summnerNote.ProductInfo = request.values['ProductInfo'] if 'ProductInfo' in request.values else ''
     summnerNote.Productsku = request.values['Productsku'] if 'Productsku' in request.values else ''
     summnerNote.ProductFormat = request.values['ProductFormat'] if 'ProductFormat' in request.values else ''

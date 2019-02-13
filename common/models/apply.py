@@ -7,7 +7,8 @@ class Apply(db.Model):
     __tablename__ = 'apply'
 
     Aid = db.Column(db.BigInteger, primary_key=True)                                                       # 商铺id号码
-    ShopCategory = db.Column(db.BigInteger, primary_key=True)                                              # 实体店属性
+    Cid = db.Column(db.BigInteger, nullable=False, server_default=db.FetchedValue())                      # 顾客id
+    ShopCategory = db.Column(db.BigInteger, nullable=False, server_default=db.FetchedValue())               # 实体店属性
     IdentityCard = db.Column(db.String(500), nullable=False, server_default=db.FetchedValue())              # 身份证正面照片
     IdentityCardHand = db.Column(db.String(500), nullable=False, server_default=db.FetchedValue())          # 手持身份证
     BusinessLicense= db.Column(db.String(500), nullable=False, server_default=db.FetchedValue())          # 营业执照
