@@ -43,6 +43,9 @@ def showcustomer():
                 'Cid': item.Cid,
                 'CustomerName': str(item.CustomerName),
                 'CustomerPhone': str(item.CustomerPhone),
+                'MyBalance': str(item.MyBalance),
+                'AvailableBalance': str(item.AvailableBalance),
+                'MyIncome': str(item.MyIncome),
                 'Cidentity': int(item.Cidentity),
             }
             data_list.append(tmp_data)

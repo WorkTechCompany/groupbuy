@@ -61,10 +61,10 @@ def apply():
     return jsonify(resp)
 
 # 申请商户
-@route_wechat.route("/checkapply/")
+@route_wechat.route("/checkapply/", methods=['POST'])
 def checkapply():
 
-    resp = {'code': 200, 'msg': '审核通过，请登录后台管理系统进行操作'}
+    resp = {'code': 200, 'msg': '审核通过，恭喜您成为团长'}
     req = request.values
     #
     Cid = req['Cid']
@@ -78,7 +78,7 @@ def checkapply():
         return jsonify(resp)
     if info.ApplyStatus == -1:
         resp['code'] = -1
-        resp['msg'] = '审核未通过'
+        resp['msg'] = '审核未通过，请完善信息后重新提交'
         return jsonify(resp)
 
 # 展示地址
