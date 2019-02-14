@@ -2,8 +2,6 @@ from web.controllers.account import route_account
 from flask import jsonify, request
 from common.models.product import Product
 from common.libs.UrlManager import UrlManager
-from common.models.productimage import Productimage
-from common.models.productformat import ProductFormat
 from sqlalchemy import or_
 import os
 from application import app, db
