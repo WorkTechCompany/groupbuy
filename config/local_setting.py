@@ -14,5 +14,5 @@ SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://bryant:leekobe24@cd-cdb-nmj4h99o.sql.
 SQLALCHEMY_TRACK_MODIFICATIONS = True
 SQLALCHEMY_ENCODING = "utf8mb4"
 SQLALCHEMY_BINDS = {
-    'mysql+pymysql://bryant:leekobe24@cd-cdb-nmj4h99o.sql.tencentcdb.com:63625/groupbuy"
+    'groupbuy': "mysql+pymysql://bryant:leekobe24@cd-cdb-nmj4h99o.sql.tencentcdb.com:63625/groupbuy"
 }
