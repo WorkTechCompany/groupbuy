@@ -20,3 +20,14 @@ SQLALCHEMY_BINDS = {
 API_IGNORE_URLS = [
     "^/account"
 ]
+
+IGNORE_CHECK_LOGIN_URLS = [
+    "^/static"
+]
+
+## 过滤url
+IGNORE_URLS = [
+    "^/user/login"
+    # "^/upload"
+
+]
