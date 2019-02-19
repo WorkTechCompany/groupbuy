@@ -15,10 +15,12 @@ def placeorder():
     resp = {'code': 200, 'msg': '下单成功'}
     trolley_result = request.values['trolley_list']
     if trolley_result:
-        for item in trolley_result:
-            result = ShoppingTrolley.query.filter_by(Id=int(item)).first()
-            db.session.delete(result)
-            db.session.commit()
+        trolley_list = trolley_result.strip(',').split(',')
+        if trolley_list:
+            for item in trolley_list:
+                result = ShoppingTrolley.query.filter_by(Id=int(item)).first()
+                db.session.delete(result)
+                db.session.commit()
 
     result = json.loads(request.values['order_list'])
     for item in result:

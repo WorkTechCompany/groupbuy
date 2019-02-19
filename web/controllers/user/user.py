@@ -72,11 +72,11 @@ def login():
 
     if identity == 1:
         result['identity'] = user_info.identity
-        result['Authorization'] = UserService.geneAuthCode(user_info)
+        result['Authorization'] = '1' + '#' + UserService.geneAuthCode(user_info) + '#' + str(user_info.uid)
         result['Shopid'] = 0
     else:
         result['Aid'] = user_info.Aid
-        result['Authorization'] = UserService.geneAuthCode_Apply(user_info)
+        result['Authorization'] = '2' + '#' + UserService.geneAuthCode_Apply(user_info) + '#' + str(user_info.Aid)
         shop_result = Shop.query.filter_by(Aid=user_info.Aid).first()
         if shop_result:
             result['Shopid'] = shop_result.Shopid
@@ -85,8 +85,9 @@ def login():
 
     response = make_response(json.dumps(result))
     response.headers['Access-Control-Allow-Origin'] = '*'
+
     # if identity == 1:
-        # response.set_cookie(app.config['AUTH_COOKIE_NAME'], "%s#%s" % (UserService.geneAuthCode(user_info), user_info.uid))
+    #     response.set_cookie(app.config['AUTH_COOKIE_NAME'], "%s#%s" % (UserService.geneAuthCode(user_info), user_info.uid))
     # else:
     #     response.set_cookie(app.config['AUTH_COOKIE_NAME'], "%s#%s" % (UserService.geneAuthCode(user_info), user_info.Aid))
 

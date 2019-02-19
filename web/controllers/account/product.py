@@ -66,6 +66,7 @@ def allproduct():
 
     response = jsonify(resp)
     response.headers['Access-Control-Allow-Origin'] = '*'
+    # response.headers['Access-Control-Allow-Headers'] = 'Authorization'
     return response
 
 # 编辑商品
