@@ -6,7 +6,7 @@ from sqlalchemy.schema import FetchedValue
 class Shop(db.Model):
     __tablename__ = 'shop'
 
-    ShopId = db.Column(db.BigInteger, primary_key=True)                                                    # 商店ID
+    Shopid = db.Column(db.BigInteger, primary_key=True)                                                    # 商店ID
     Aid = db.Column(db.BigInteger, nullable=False, server_default=db.FetchedValue())                       # 商户ID
     ShopName = db.Column(db.String(100), nullable=False, server_default=db.FetchedValue())                 # 商户名称
     ShopImage = db.Column(db.String(100), nullable=False, server_default=db.FetchedValue())                # 商户图片

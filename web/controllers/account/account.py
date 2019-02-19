@@ -14,7 +14,7 @@ def user():
     query = User.query
     page = int(req['p']) if ('p' in req and req['p']) else 1
 
-    if 'mix_kw' in  req:
+    if 'mix_kw' in req:
         rule = or_(User.nickname.ilike("%{0}%".format(req['mix_kw'])), User.mobile.ilike("%{0}%".format(req['mix_kw'])))
         query = query.filter(rule)
 

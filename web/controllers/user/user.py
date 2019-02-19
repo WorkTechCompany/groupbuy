@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify, make_response
 from common.libs.Helper import ops_render
 from common.models.User import User
+from common.models.shop import Shop
 from common.models.apply import Apply
 from application import app, db
 from common.libs.user.UserService import UserService
@@ -9,8 +10,6 @@ import json
 
 @route_user.route("/login/", methods=["GET","POST"])
 def login():
-    if request.method == "GET":
-        return ops_render("user/login.html")
 
     result = {'code': 200, 'msg': '操作成功'}
     req = request.values
@@ -50,28 +49,46 @@ def login():
         response = jsonify(result)
         response.headers['Access-Control-Allow-Origin'] = '*'
         return response
-
-    if user_info.login_pwd != UserService.genePwd(login_pwd, user_info.login_salt):
-        result['code'] = -1
-        result['msg'] = '密码错误'
-        response = jsonify(result)
-        response.headers['Access-Control-Allow-Origin'] = '*'
-        return response
-
-    if user_info.status == -1:
-        result['code'] = -1
-        result['msg'] = '账号失效'
-        response = jsonify(result)
-        response.headers['Access-Control-Allow-Origin'] = '*'
-        return response
+    if identity == 1:
+        if user_info.login_pwd != UserService.genePwd(login_pwd, user_info.login_salt):
+            result['code'] = -1
+            result['msg'] = '密码错误'
+            response = jsonify(result)
+            response.headers['Access-Control-Allow-Origin'] = '*'
+            return response
+        if user_info.status == -1:
+            result['code'] = -1
+            result['msg'] = '账号失效'
+            response = jsonify(result)
+            response.headers['Access-Control-Allow-Origin'] = '*'
+            return response
+    else:
+        if user_info.ApplyPassword != UserService.genePwd(login_pwd, user_info.Applylogin_salt):
+            result['code'] = -1
+            result['msg'] = '密码错误'
+            response = jsonify(result)
+            response.headers['Access-Control-Allow-Origin'] = '*'
+            return response
 
     if identity == 1:
         result['identity'] = user_info.identity
+        result['Authorization'] = UserService.geneAuthCode(user_info)
+        result['Shopid'] = 0
     else:
         result['Aid'] = user_info.Aid
+        result['Authorization'] = UserService.geneAuthCode_Apply(user_info)
+        shop_result = Shop.query.filter_by(Aid=user_info.Aid).first()
+        if shop_result:
+            result['Shopid'] = shop_result.Shopid
+        else:
+            result['Shopid'] = -1
+
     response = make_response(json.dumps(result))
     response.headers['Access-Control-Allow-Origin'] = '*'
-    response.set_cookie(app.config['AUTH_COOKIE_NAME'], "%s#%s" % (UserService.geneAuthCode(user_info), user_info.uid))
+    # if identity == 1:
+        # response.set_cookie(app.config['AUTH_COOKIE_NAME'], "%s#%s" % (UserService.geneAuthCode(user_info), user_info.uid))
+    # else:
+    #     response.set_cookie(app.config['AUTH_COOKIE_NAME'], "%s#%s" % (UserService.geneAuthCode(user_info), user_info.Aid))
 
     return response
 

@@ -70,6 +70,11 @@ def checkapply():
     Cid = req['Cid']
     info = Apply.query.filter_by(Cid=Cid).first()
 
+    if not info:
+        resp['msg'] = '暂未申请'
+        resp['code'] = -2
+        return jsonify(resp)
+
     if info.ApplyStatus == 1:
         return jsonify(resp)
     if info.ApplyStatus == 0:

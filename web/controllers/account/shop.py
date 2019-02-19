@@ -17,7 +17,7 @@ def getshopinfo():
 
     if result:
         tmp_data = {
-            'ShopId': result.ShopId,
+            'Shopid': result.Shopid,
             'Aid': result.Aid,
             'ShopName': str(result.ShopName),
             'ShopImage': str(result.ShopImage),
@@ -42,12 +42,12 @@ def getshopinfo():
 def shopedit():
 
     resp = {'code': 200, 'msg': '操作成功~'}
-    ShopId = request.values['ShopId'] if 'ShopId' in request.values else -1
+    Shopid = request.values['Shopid'] if 'Shopid' in request.values else -1
 
     summnerNote = Shop()
 
-    if ShopId != -1 and ShopId:
-        summnerNote = Shop.query.filter_by(ShopId=ShopId).first()
+    if Shopid != -1 and Shopid:
+        summnerNote = Shop.query.filter_by(Shopid=Shopid).first()
 
     summnerNote.Aid = request.values['Aid'] if 'Aid' in request.values else ''
     summnerNote.ShopName = request.values['ShopName'] if 'ShopName' in request.values else ''
@@ -60,6 +60,9 @@ def shopedit():
     db.session.add(summnerNote)
     db.session.commit()
 
+    Shopid = summnerNote.Shopid
+
+    resp['Shopid'] = Shopid
     response = jsonify(resp)
     response.headers['Access-Control-Allow-Origin'] = '*'
     return response

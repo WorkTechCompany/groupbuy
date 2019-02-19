@@ -2,6 +2,7 @@ from flask import request, jsonify
 from common.models.product import Product
 from sqlalchemy import or_
 from web.wechat_controllers import route_wechat
+from common.models.shop import Shop
 import json
 
 @route_wechat.route("/home/", methods=['GET', 'POST'])
@@ -23,21 +24,22 @@ def home():
         rule = or_(Product.ShopName.ilike("%{0}%".format(info)))
         query = query.filter(rule)
 
-    shop_list = query.order_by(Product.PId.desc()) \
+    shop_list = query.order_by(Product.Pid.desc()) \
         .offset(offset).limit(page_size).all()
 
     data_food_list = []
     if shop_list:
         for item in shop_list:
-            price = json.loads(item.ProductFormat)[0]['price']
-            stock = json.loads(item.ProductFormat)[0]['stock']
+            # price = json.loads(item.ProductFormat)[0]['price']
+            # stock = json.loads(item.ProductFormat)[0]['stock']
             tmp_data = {
-                'PId': item.PId,
+                'Pid': item.Pid,
+                'Aid': item.Aid,
                 'ProductName': "%s" % (item.ProductName),
-                'ShopId': "%s" % (item.ShopId),
-                'ProdectPrice': str(price),
+                'Shopid': "%s" % (item.Shopid),
+                'ProductPrice': str(item.ProductPrice),
+                'ProductStock': int(item.ProductStock),
                 'ProductImage': str(item.ProductImage),
-                'ProductStock': int(stock),
                 'ProductSold': str(item.ProductSold)
             }
             data_food_list.append(tmp_data)
@@ -50,20 +52,60 @@ def productInfo():
     resp = {'code': 200, 'msg': '操作成功~', 'data': {}}
     req = request.values
 
-    PId = int(req['PId']) if 'PId' in req else -1
+    Pid = int(req['Pid']) if 'Pid' in req else -1
 
-    productinfo = Product.query.filter_by(PId=PId).first()
+    productinfo = Product.query.filter_by(Pid=Pid).first()
 
     if productinfo:
+        shop_info = []
+        ShopInfo = Shop.query.filter_by(Shopid=productinfo.Shopid).first()
+        shop = {
+            'Shopid': ShopInfo.Shopid,
+            'Aid': ShopInfo.Aid,
+            'ShopName': ShopInfo.ShopName,
+            'ShopImage': ShopInfo.ShopImage,
+            'ShopCategory': ShopInfo.ShopCategory,
+            'ShopProvince': ShopInfo.ShopProvince,
+            'ShopCity': ShopInfo.ShopCity,
+            'ShopCountry': ShopInfo.ShopCountry,
+        }
+        shop_info.append(shop)
         tmp_data = {
-            'PId': productinfo.PId,
+            'Pid': productinfo.Pid,
+            'Aid': productinfo.Aid,
             'ProductName': "%s" % (productinfo.ProductName),
-            'ShopId': "%s" % (productinfo.ShopId),
+            'ShopInfo': shop_info,
             'ProductMerchanName': "%s" % (productinfo.ProductMerchanName),
             'ProductInfo': "%s" % (productinfo.ProductInfo),
-            'ProductFormat': str(productinfo.ProductFormat),
+            'ProductPrice': str(productinfo.ProductPrice),
+            'ProductStock': int(productinfo.ProductStock),
             'ProductImage': str(productinfo.ProductImage),
             'ProductSold': str(productinfo.ProductSold)
         }
         resp['data'] = tmp_data
     return jsonify(resp)
+
+
+#                                  _oo8oo_
+#                                 o8888888o
+#                                 88" . "88
+#                                 (| -_- |)
+#                                 0\  =  /0
+#                               ___/'==='\___
+#                             .' \\|     |# '.
+#                            / \\|||  :  |||# \
+#                           / _||||| -:- |||||_ \
+#                          |   | \\\  -  #/ |   |
+#                          | \_|  ''\---/''  |_/ |
+#                          \  .-\__  '-'  __/-.  /
+#                        ___'. .'  /--.--\  '. .'___
+#                     ."" '<  '.___\_<|>_/___.'  >' "".
+#                    | | :  `- \`.:`\ _ /`:.`/ -`  : | |
+#                    \  \ `-.   \_ __\ /__ _/   .-` /  /
+#                =====`-.____`.___ \_____/ ___.`____.-`=====
+#                                  `=---=`
+#
+#
+#               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#
+#                          强大爷保佑         永不宕机/永无bug

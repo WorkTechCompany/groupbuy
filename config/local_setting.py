@@ -16,3 +16,7 @@ SQLALCHEMY_ENCODING = "utf8mb4"
 SQLALCHEMY_BINDS = {
     'groupbuy': "mysql+pymysql://bryant:leekobe24@cd-cdb-nmj4h99o.sql.tencentcdb.com:63625/groupbuy"
 }
+
+API_IGNORE_URLS = [
+    "^/account"
+]

@@ -11,6 +11,13 @@ class UserService():
         return m.hexdigest()
 
     @staticmethod
+    def geneAuthCode_Apply(user_info):
+        m = hashlib.md5()
+        str = "%s-%s-%s-%s" % (user_info.Aid, user_info.ApplyPhone, user_info.ApplyPassword,user_info.Applylogin_salt)
+        m.update(str.encode("utf-8"))
+        return m.hexdigest()
+
+    @staticmethod
     def genePwd(pwd, salt):
         m = hashlib.md5()
         str = "%s-%s" % (base64.encodebytes(pwd.encode("utf-8")) , salt)
