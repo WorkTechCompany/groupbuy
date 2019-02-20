@@ -18,7 +18,7 @@ class Product(db.Model):
     ProductStock = db.Column(Integer, nullable=False, server_default=db.FetchedValue())                     # 商品库存
     # Productsku = db.Column(TEXT, nullable=False, server_default=db.FetchedValue())                        # 商品规格
     # ProductFormat = db.Column(TEXT, nullable=False, server_default=db.FetchedValue())                     # 商品规格
-    ProductImage = db.Column(db.String(128), nullable=False, server_default=db.FetchedValue())           # 商品图片
+    ProductImage = db.Column(TEXT, nullable=False, server_default=db.FetchedValue())           # 商品图片
     ProductAttributes = db.Column(db.BigInteger, nullable=False, server_default=db.FetchedValue())      # 销售属性
     ProductProvince = db.Column(db.String(100), nullable=False, server_default=db.FetchedValue())            # 省份
     ProductCity = db.Column(db.String(100), nullable=False, server_default=db.FetchedValue())                # 市区

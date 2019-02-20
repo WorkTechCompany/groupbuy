@@ -10,32 +10,46 @@ from common.libs.Helper import getCurrentDate
 
 @route_wechat.route("/showtrolley/", methods=['GET', 'POST'])
 def showtrolley():
-    resp = {'code': 200, 'msg': '查询成功'}
+    resp = {'code': 200, 'msg': '查询成功', 'data': {}}
 
     Cid = request.values['Cid'] if 'Cid' in request.values else ''
+    page = int(request.values['page']) if 'page' in request.values else 1
+
+    if page < 1:
+        page = 1
+
+    page_size = 10
+    offset = (page - 1) * page_size
 
     query = ShoppingTrolley.query.filter_by(Cid=Cid)
 
-    result = query.all()
+    totalCount = query.count()
+
+    shop_list = query.order_by(ShoppingTrolley.Id.desc()) \
+        .offset(offset).limit(page_size).all()
+
     tmp_list = []
-    for item in result:
-        tmp_data = {
-            'Id': item.Id,
-            'Pid': item.Pid,
-            'Cid': item.Cid,
-            'Shopid': item.Shopid,
-            'ShopName': item.ShopName,
-            'ProductName': item.ProductName,
-            'ProductImage': item.ProductImage,
-            'Count': item.Count,
-            'TrolleyPrice': str(item.TrolleyPrice),
-            'selected': False
-            # 'ProductFormat': item.ProductFormat
-        }
-        tmp_list.append(tmp_data)
+    if shop_list:
+        for item in shop_list:
+            tmp_data = {
+                'Id': item.Id,
+                'Pid': item.Pid,
+                'Cid': item.Cid,
+                'Shopid': item.Shopid,
+                'ShopName': item.ShopName,
+                'ProductName': item.ProductName,
+                'ProductImage': item.ProductImage,
+                'Count': item.Count,
+                'TrolleyPrice': str(item.TrolleyPrice),
+                'selected': False
+                # 'ProductFormat': item.ProductFormat
+            }
+            tmp_list.append(tmp_data)
 
-    resp['list'] = tmp_list
-
+    # resp['list'] = tmp_list
+    resp['data']['list'] = tmp_list
+    resp['data']['has_more'] = 0 if len(tmp_list) < page_size else 1
+    resp['totalCount'] = totalCount
     return jsonify(resp)
 
 @route_wechat.route("/addtrolley/", methods=['GET', 'POST'])

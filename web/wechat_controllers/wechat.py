@@ -21,7 +21,7 @@ def home():
     query = Product.query.filter_by()
 
     if info:
-        rule = or_(Product.ShopName.ilike("%{0}%".format(info)))
+        rule = or_(Product.ProductName.ilike("%{0}%".format(info)))
         query = query.filter(rule)
 
     shop_list = query.order_by(Product.Pid.desc()) \
@@ -84,28 +84,3 @@ def productInfo():
         }
         resp['data'] = tmp_data
     return jsonify(resp)
-
-
-#                                  _oo8oo_
-#                                 o8888888o
-#                                 88" . "88
-#                                 (| -_- |)
-#                                 0\  =  /0
-#                               ___/'==='\___
-#                             .' \\|     |# '.
-#                            / \\|||  :  |||# \
-#                           / _||||| -:- |||||_ \
-#                          |   | \\\  -  #/ |   |
-#                          | \_|  ''\---/''  |_/ |
-#                          \  .-\__  '-'  __/-.  /
-#                        ___'. .'  /--.--\  '. .'___
-#                     ."" '<  '.___\_<|>_/___.'  >' "".
-#                    | | :  `- \`.:`\ _ /`:.`/ -`  : | |
-#                    \  \ `-.   \_ __\ /__ _/   .-` /  /
-#                =====`-.____`.___ \_____/ ___.`____.-`=====
-#                                  `=---=`
-#
-#
-#               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#
-#                          强大爷保佑         永不宕机/永无bug

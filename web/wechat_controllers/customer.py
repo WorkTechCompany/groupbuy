@@ -6,6 +6,7 @@ from application import app, db
 from flask import request, jsonify
 from common.models.customer import Customer
 from common.models.customer_login import CustomerLogin
+from common.libs.member.MemberService import MemberService
 
 
 # 用户信息
@@ -39,6 +40,7 @@ def customesignin():
         signup.CustomerPayword = UserService.genePwd(CustomerPayword, signup.Payword_salt)
 
     signup.created_time = getCurrentDate()
+    signup.openid = -1
     Cid = signup.Cid
     db.session.add(signup)
     db.session.commit()
@@ -57,12 +59,83 @@ def customesignin():
 
     return jsonify(resp)
 
+
+# @route_api.route("/member/login", methods=["GET", "POST"])
+# def login():
+#     resp = {'code': 200, 'msg': "操作成功"}
+#     req = request.values
+#     code = req['code'] if 'code' in req else ''
+#     if not code or len(code) < 1:
+#         resp['code'] = -1
+#         resp['msg'] = '需要code'
+#         return jsonify(resp)
+#
+#     openid = MemberService.getOpenId(code)
+#
+#     nickname = req['nickName'] if 'nickName' in req else ''
+#     gender = req['gender'] if 'gender' in req else ''
+#     avatarUrl = req['avatarUrl'] if 'avatarUrl' in req else ''
+#
+#     '''
+#         判断是否注册过
+#     '''
+#     bind_info = OauthMemberBind.query.filter_by(openid=openid, type=1).first()
+#     if not bind_info:
+#         model_member = Member()
+#         model_member.nickname = nickname
+#         model_member.sex = gender
+#         model_member.avatar = avatarUrl
+#         model_member.salt = MemberService.geneSalt()
+#         model_member.updated_time = getCurrentDate()
+#         model_member.created_time = getCurrentDate()
+#
+#         db.session.add(model_member)
+#         db.session.commit()
+#
+#         model_bind = OauthMemberBind()
+#         model_bind.member_id = model_member.id
+#         model_bind.type = 1
+#         model_bind.openid = openid
+#         model_bind.extra = ''
+#         model_bind.created_time = getCurrentDate()
+#         model_bind.updated_time = getCurrentDate()
+#
+#         db.session.add(model_bind)
+#         db.session.commit()
+#
+#         bind_info = model_bind
+#
+#     member_info = Member.query.filter_by(id=bind_info.member_id).first()
+#
+#     token = "%s#%s" % (MemberService.geneAuthCode(member_info), member_info.id)
+#     resp['data'] = {'token': token}
+#
+#     return jsonify(resp)
+
+@route_wechat.route("/getopenid/", methods=['POST'])
+def getopenid():
+    result = {'code': 200, 'msg': '获取成功'}
+    req = request.values
+    code = req['code'] if 'code' in req else ''
+    if not code or len(code) < 1:
+        result['code'] = -1
+        result['msg'] = '需要code'
+        return jsonify(result)
+    openid = MemberService.getOpenId(code)
+    result['openid'] = openid
+    return jsonify(result)
+
 @route_wechat.route("/customeLogin/", methods=['POST'])
 def customeLogin():
     result = {'code': 200, 'msg': '登录成功'}
     req = request.values
     CustomerPhone = req['CustomerPhone'] if 'CustomerPhone' in req else ''
     CustomerPassword = req['CustomerPassword'] if 'CustomerPassword' in req else ''
+    openid = req['openid'] if 'openid' in req else ''
+    if not openid or len(openid) < 1:
+        result['code'] = -1
+        result['msg'] = '需要openid'
+        return jsonify(result)
 
     if CustomerPhone is None or len(CustomerPhone) < 1:
         result['code'] = -1
@@ -94,9 +167,11 @@ def customeLogin():
         response.headers['Access-Control-Allow-Origin'] = '*'
         return response
 
-    # response = make_response(json.dumps(result))
-    # response.headers['Access-Control-Allow-Origin'] = '*'
-    # response.set_cookie(app.config['AUTH_COOKIE_NAME'], "%s#%s" % (UserService.geneAuthCode(user_info), user_info.uid))
+    user_info.openid = openid
+    db.session.commit()
+
+    token = "%s#%s" % (MemberService.geneAuthCode(user_info), user_info.Cid)
+    result['data'] = {'token': token}
     result['Cid'] = user_info.Cid
     return jsonify(result)
 

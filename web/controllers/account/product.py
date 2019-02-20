@@ -133,7 +133,7 @@ def addproduct():
     summnerNote = Product()
 
     summnerNote.ProductName = request.values['ProductName'] if 'ProductName' in request.values else ''
-    summnerNote.Shopid = request.values['Shopid'] if 'Shopid' in request.values else 1
+    summnerNote.Shopid = request.values['Shopid'] if 'Shopid' in request.values else -1
     summnerNote.Aid = request.values['Aid'] if 'Aid' in request.values else 1
     summnerNote.ProductMerchanName = request.values[
         'ProductMerchanName'] if 'ProductMerchanName' in request.values else '胡桃夹子'
