@@ -39,12 +39,14 @@ def showorder():
     else:
         query = PayOrder.query
     # 待付款：1   申请退款 待付款
-    if OrderStatus == 1:
-        query = PayOrder.query.filter_by(status=-8)
-    if OrderStatus == 2:
-        query = PayOrder.query.filter(or_(PayOrder.status == -7, PayOrder.status == -6))
-    if OrderStatus == 3:
-        query = PayOrder.query.filter(or_(PayOrder.status == 0, PayOrder.status == -5))
+    # if OrderStatus == 1:
+    #     query = PayOrder.query.filter_by(status=-8)
+    # if OrderStatus == 2:
+    #     query = PayOrder.query.filter(or_(PayOrder.status == -7, PayOrder.status == -6))
+    # if OrderStatus == 3:
+    #     query = PayOrder.query.filter(or_(PayOrder.status == 0, PayOrder.status == -5))
+    if OrderStatus != -1:
+        query = PayOrder.query.filter_by(status=OrderStatus)
 
     totalCount = query.count()
 
@@ -52,8 +54,7 @@ def showorder():
         rule = or_(PayOrder.id.ilike("%{0}%".format(info)))
         query = query.filter(rule)
 
-    order_list = query.order_by(PayOrder.id.desc()) \
-        .offset(offset).limit(page_size).all()
+    order_list = query.order_by(PayOrder.id.desc()).offset(offset).limit(page_size).all()
 
     o_list = []
     if order_list:
@@ -253,8 +254,7 @@ def orderinfo():
 # 退款审核
 @route_account.route("/order_refund/", methods=['POST'])
 def order_refund():
-    resp = {'code': 200, 'msg': '操作成功'}
-
+    # resp = {'code': 200, 'msg': '操作成功'}
     # Oid = request.values['Oid'] if 'Oid' in request.values else -1
     # OrderStatus = request.values['OrderStatus'] if 'OrderStatus' in request.values else 0
     # OrderRefundStatus = request.values['OrderRefundStatus'] if 'OrderRefundStatus' in request.values else 0
@@ -270,6 +270,30 @@ def order_refund():
     result = PayOrder.query.filter_by(id=id).first()
     result.status = 0
 
+    db.session.commit()
+    response = jsonify(resp)
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    return response
+
+@route_account.route("/ordersend/", methods=['POST'])
+def ordersend():
+    # resp = {'code': 200, 'msg': '操作成功'}
+    # Oid = request.values['Oid'] if 'Oid' in request.values else -1
+    # OrderStatus = request.values['OrderStatus'] if 'OrderStatus' in request.values else 0
+    # OrderRefundStatus = request.values['OrderRefundStatus'] if 'OrderRefundStatus' in request.values else 0
+    # result = Order.query.filter_by(Oid=Oid).first()
+    # result.OrderRefundStatus = int(OrderRefundStatus)
+    # result.OrderStatus = int(OrderStatus)
+    #
+    # db.session.commit()
+
+    resp = {'code': 200, 'msg': '发货成功'}
+
+    id = request.values['id'] if 'id' in request.values else -1
+    result = PayOrder.query.filter_by(id=id).first()
+    result.status = -6
+
+    db.session.commit()
     response = jsonify(resp)
     response.headers['Access-Control-Allow-Origin'] = '*'
     return response
