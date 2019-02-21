@@ -3,6 +3,7 @@ import xml.etree.ElementTree as ET
 from application import app, db
 from common.models.pay.OauthAccessToken import OauthAccessToken
 from common.libs.Helper import getCurrentDate
+import time
 
 
 class WeChatService():
@@ -42,7 +43,7 @@ class WeChatService():
             pay_sign_data = {
                 'response': response,
                 'appId': pay_data.get('appid'),
-                'timeStamp': pay_data.get('out_trade_no'),
+                'timeStamp': int(time.time()),
                 'nonceStr': pay_data.get('nonce_str'),
                 'package': 'prepay_id={0}'.format(prepay_id),
                 'signType': 'MD5'
