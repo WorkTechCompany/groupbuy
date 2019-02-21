@@ -36,8 +36,11 @@ class WeChatService():
         r.encoding = "utf-8"
 
         if r.status_code == 200:
+            response = self.xml_to_dict(r.text)
             prepay_id = self.xml_to_dict(r.text).get('prepay_id')
+
             pay_sign_data = {
+                'response': response,
                 'appId': pay_data.get('appid'),
                 'timeStamp': pay_data.get('out_trade_no'),
                 'nonceStr': pay_data.get('nonce_str'),
