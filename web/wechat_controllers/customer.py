@@ -211,7 +211,7 @@ def recharge():
     resp = {'code': 200, 'msg': "下单成功", 'data': {}}
     req = request.values
 
-    recharge = req['recharge'] if 'recharge' in req and req['recharge'] else ''
+    recharge = 'recharge'
     Cid = int(req['Cid']) if 'Cid' in req and req['Cid'] else 0
     Shopid = -200
     trolley_result = -200
