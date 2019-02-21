@@ -49,7 +49,7 @@ def showorder():
     if OrderStatus == 1:
         query = PayOrder.query.filter_by(status=-8)
     if OrderStatus == 2:
-        query = PayOrder.query.filter(or_(PayOrder.status == -7, PayOrder.status == -6))
+        query = PayOrder.query.filter(or_(PayOrder.status == -7, PayOrder.status == -6, PayOrder.status==1))
     if OrderStatus == 3:
         query = PayOrder.query.filter(or_(PayOrder.status == 0, PayOrder.status == -5))
 
