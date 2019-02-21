@@ -278,7 +278,10 @@ def pay():
 
     }
 
+    logging.info(data)
+
     pay_info = target_wechat.get_pay_info(data)
+
 
     # 保存prepay_id
     pay_order_info.prepay_id = pay_info['prepay_id']
@@ -291,6 +294,7 @@ def pay():
 
 @route_wechat.route("/callback/", methods=["POST"])
 def callback():
+    logging.info('进入回调函数')
     result_data = {
         'return_code': 'SUCCESS',
         'return_msg': 'OK'
@@ -299,7 +303,7 @@ def callback():
     header = {'Content-Type':'application/xml'}
     config_mina = app.config['MINA_APP']
 
-    logging.info(request.data)
+    # logging.info(request.data)
 
     target_wechat = WeChatService(merchant_key=config_mina['paykey'])
     # print(request.data)
@@ -311,14 +315,14 @@ def callback():
     gene_sign = target_wechat.create_sign(callback_data)
 
     if sign != gene_sign:
-        logging.info('sing!=gene_sign')
+        # logging.info('sing!=gene_sign')
         result_data['return_code'] = result_data['return_msg'] = "FAIL"
         return target_wechat.dict_to_xml(result_data), header
 
     order_sn = callback_data['out_trade_no']
     pay_order_info = PayOrder.query.filter_by(order_sn=order_sn).first()
     if not pay_order_info:
-        logging.info('not pay_order_info')
+        # logging.info('not pay_order_info')
         result_data['return_code'] = result_data['return_msg'] = "FAIL"
         return target_wechat.dict_to_xml(result_data), header
 
@@ -327,7 +331,7 @@ def callback():
     #     return target_wechat.dict_to_xml(result_data), header
 
     if pay_order_info.status == 1:
-        logging.info('pay_order_info.status == 1')
+        # logging.info('pay_order_info.status == 1')
         return target_wechat.dict_to_xml(result_data), header
 
     target_pay = PayService()
