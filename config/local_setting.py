@@ -33,13 +33,14 @@ IGNORE_URLS = [
 ]
 
 MINA_APP = {
-    # 'appid':'wx1f244139ab0c54c8',
-    'appid': 'wx67efb8952b1c941c',
-    # 'appkey':'c7435a2f34d9f774144696fa68648499',
-    'appkey': '8723974ba43eb0d3f0405d2bdf2db38f',
+    'appid':'wx1f244139ab0c54c8',
+    # 'appid': 'wx67efb8952b1c941c',
+    'appkey':'c7435a2f34d9f774144696fa68648499',
+    # 'appkey': '8723974ba43eb0d3f0405d2bdf2db38f',
     'paykey': 'TM8KwVFRlp0hsTWMQTxLplfFIzmk7csr',
-    'mch_id': '1471175702',
-    'callback_url':'/account/callback/'
+    'mch_id': '1513434041',
+    # 'mch_id': '1471175702',
+    'callback_url': '/account/callback/'
 }
 
 PAY_STATUS_DISPLAY_MAPPING = {
