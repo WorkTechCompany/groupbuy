@@ -14,20 +14,20 @@ from common.models.customer_login import CustomerLogin
 from common.libs.Helper import getCurrentDate, getFormatDate
 from common.libs.pay.PayService import PayService
 import json
-import logging
-from logging.handlers import RotatingFileHandler
-#
-#
-#
-log_file = 'log.log'
-root_logging = logging.getLogger()
-root_logging.setLevel(logging.INFO)
-formatter = logging.Formatter('%(asctime)s [%(name)s:%(filename)s:%(lineno)d] [%(levelname)s]- %(message)s')
-# 文件最大2M
-rotating_file_log = RotatingFileHandler(log_file, maxBytes=10485760, backupCount=3)
-rotating_file_log.setLevel(logging.INFO)
-rotating_file_log.setFormatter(formatter)
-root_logging.addHandler(rotating_file_log)
+# import logging
+# from logging.handlers import RotatingFileHandler
+# #
+# #
+# #
+# log_file = 'log.log'
+# root_logging = logging.getLogger()
+# root_logging.setLevel(logging.INFO)
+# formatter = logging.Formatter('%(asctime)s [%(name)s:%(filename)s:%(lineno)d] [%(levelname)s]- %(message)s')
+# # 文件最大2M
+# rotating_file_log = RotatingFileHandler(log_file, maxBytes=10485760, backupCount=3)
+# rotating_file_log.setLevel(logging.INFO)
+# rotating_file_log.setFormatter(formatter)
+# root_logging.addHandler(rotating_file_log)
 
 @route_wechat.route("/showorder/", methods=['POST'])
 def showorder():
@@ -299,7 +299,7 @@ def callback():
     header = {'Content-Type':'application/xml'}
     config_mina = app.config['MINA_APP']
 
-    logging.info(request.data)
+    # logging.info(request.data)
 
     target_wechat = WeChatService(merchant_key=config_mina['paykey'])
     # print(request.data)
@@ -319,9 +319,9 @@ def callback():
         result_data['return_code'] = result_data['return_msg'] = "FAIL"
         return target_wechat.dict_to_xml(result_data), header
 
-    if int(pay_order_info.total_price * 100) ==int(callback_data['total_fee']):
-        result_data['return_code'] = result_data['return_msg'] = "FAIL"
-        return target_wechat.dict_to_xml(result_data), header
+    # if int(pay_order_info.total_price * 100) == int(callback_data['total_fee']):
+    #     result_data['return_code'] = result_data['return_msg'] = "FAIL"
+    #     return target_wechat.dict_to_xml(result_data), header
 
     if pay_order_info.status == 1:
         return target_wechat.dict_to_xml(result_data), header
