@@ -126,10 +126,10 @@ class PayService():
             pay_order_items = PayOrderItem.query.filter_by(pay_order_id=pay_order_id).all()
             for order_item in pay_order_items:
                 tmp_model_sale_log = ShopSaleChangeLog()
-                tmp_model_sale_log.food_id = order_item.Pid
+                tmp_model_sale_log.Pid = order_item.Pid
                 tmp_model_sale_log.quantity = order_item.quantity
                 tmp_model_sale_log.price = order_item.price
-                tmp_model_sale_log.member_id = order_item.Cid
+                tmp_model_sale_log.Cid = order_item.Cid
                 tmp_model_sale_log.created_time = getCurrentDate()
 
                 db.session.add(tmp_model_sale_log)
