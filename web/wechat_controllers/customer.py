@@ -8,6 +8,7 @@ import decimal
 import json
 from common.models.customer import Customer
 from common.models.customer_login import CustomerLogin
+from common.models.Balacelog.Balancelog import Balancelog
 from common.libs.member.MemberService import MemberService
 from common.libs.pay.PayService import PayService
 from common.models.pay.PayOrder import PayOrder
@@ -237,7 +238,6 @@ def recharge():
     # --------------------------------------------------------------------------------
 
     order_sn = resp['data']['order_sn']
-    print(order_sn)
     pay_order_info = PayOrder.query.filter_by(order_sn=order_sn).first()
     if not pay_order_info:
         resp['code'] = -1
@@ -287,7 +287,7 @@ def recharge_callback():
         'return_msg': 'OK'
     }
 
-    header = {'Content-Type':'application/xml'}
+    header = {'Content-Type': 'application/xml'}
     config_mina = app.config['MINA_APP']
 
     # logging.info(request.data)
@@ -328,3 +328,42 @@ def recharge_callback():
     # target_pay.addPayCallbackData(pay_order_id=pay_order_info.id, data=request.data)
 
     return target_wechat.dict_to_xml(result_data), header
+
+@route_wechat.route("/withdraw/", methods=["POST"])
+def withdraw():
+    resp = {'code': 200, 'msg': "提交申请成功"}
+    req = request.values
+
+    Cid = int(req['Cid']) if 'Cid' in req and req['Cid'] else 0
+    BankCardNumber = int(req['BankCardNumber']) if 'BankCardNumber' in req and req['BankCardNumber'] else 0
+    Openingbank = int(req['Openingbank']) if 'Openingbank' in req and req['Openingbank'] else 0
+    Accountname = int(req['Accountname']) if 'Accountname' in req and req['Accountname'] else 0
+    balance = req['balance'] if 'balance' in req and req['balance'] else 0
+
+    info = Customer.query.filter_by(Cid=Cid).first()
+    mybalance = float(info.MyBalance)
+    result = float(balance)
+    mybalance = mybalance - result
+    info.MyBalance = mybalance
+    db.session.add(info)
+
+    Balance_log = Balancelog()
+
+    Balance_log.BankCardNumber = BankCardNumber
+    Balance_log.Cid = Cid
+    Balance_log.Openingbank = Openingbank
+    Balance_log.balance = balance
+    Balance_log.operating = 1
+    Balance_log.status = 1
+    Balance_log.total_balance = -1000
+    target_pay = PayService()
+    Balance_log.receipt_qrcode = target_pay.geneOrderSn()
+    Balancelog.freeze_balance = balance
+    Balance_log.Accountname = Accountname
+    Balance_log.createtime = getCurrentDate()
+    Balance_log.updatetime = getCurrentDate()
+    db.session.add(Balance_log)
+    db.session.commit()
+
+    return jsonify(resp)
+

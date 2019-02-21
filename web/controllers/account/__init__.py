@@ -9,6 +9,7 @@ from web.controllers.account.utils import *
 from web.controllers.account.apply import *
 from web.controllers.account.customer import *
 from web.controllers.account.order import *
+from web.controllers.account.balance_log import *
 
 
 @route_account.route('/')
