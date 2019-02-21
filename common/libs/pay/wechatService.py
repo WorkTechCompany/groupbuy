@@ -48,7 +48,7 @@ class WeChatService():
                 'package': 'prepay_id={0}'.format(prepay_id),
                 'signType': 'MD5'
             }
-            pay_sign = self.create_sign(pay_sign_data)
+            pay_sign = sign
             pay_sign_data.pop('appId')
             pay_sign_data['paySign'] = pay_sign
             pay_sign_data['prepay_id'] = prepay_id
