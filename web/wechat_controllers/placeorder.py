@@ -14,20 +14,20 @@ from common.models.customer_login import CustomerLogin
 from common.libs.Helper import getCurrentDate, getFormatDate
 from common.libs.pay.PayService import PayService
 import json
-# import logging
-# from logging.handlers import RotatingFileHandler
-# #
-# #
-# #
-# log_file = 'log.log'
-# root_logging = logging.getLogger()
-# root_logging.setLevel(logging.INFO)
-# formatter = logging.Formatter('%(asctime)s [%(name)s:%(filename)s:%(lineno)d] [%(levelname)s]- %(message)s')
-# # 文件最大2M
-# rotating_file_log = RotatingFileHandler(log_file, maxBytes=10485760, backupCount=3)
-# rotating_file_log.setLevel(logging.INFO)
-# rotating_file_log.setFormatter(formatter)
-# root_logging.addHandler(rotating_file_log)
+import logging
+from logging.handlers import RotatingFileHandler
+#
+#
+#
+log_file = 'log.log'
+root_logging = logging.getLogger()
+root_logging.setLevel(logging.INFO)
+formatter = logging.Formatter('%(asctime)s [%(name)s:%(filename)s:%(lineno)d] [%(levelname)s]- %(message)s')
+# 文件最大2M
+rotating_file_log = RotatingFileHandler(log_file, maxBytes=10485760, backupCount=3)
+rotating_file_log.setLevel(logging.INFO)
+rotating_file_log.setFormatter(formatter)
+root_logging.addHandler(rotating_file_log)
 
 @route_wechat.route("/showorder/", methods=['POST'])
 def showorder():
@@ -299,10 +299,11 @@ def callback():
     header = {'Content-Type':'application/xml'}
     config_mina = app.config['MINA_APP']
 
-    # logging.info(request.data)
+    logging.info(request.data)
 
     target_wechat = WeChatService(merchant_key=config_mina['paykey'])
     # print(request.data)
+
     callback_data = target_wechat.xml_to_dict(request.data)
 
     sign = callback_data['sign']
@@ -310,12 +311,14 @@ def callback():
     gene_sign = target_wechat.create_sign(callback_data)
 
     if sign != gene_sign:
+        logging.info('sing!=gene_sign')
         result_data['return_code'] = result_data['return_msg'] = "FAIL"
         return target_wechat.dict_to_xml(result_data), header
 
     order_sn = callback_data['out_trade_no']
     pay_order_info = PayOrder.query.filter_by(order_sn=order_sn).first()
     if not pay_order_info:
+        logging.info('not pay_order_info')
         result_data['return_code'] = result_data['return_msg'] = "FAIL"
         return target_wechat.dict_to_xml(result_data), header
 
@@ -324,6 +327,7 @@ def callback():
     #     return target_wechat.dict_to_xml(result_data), header
 
     if pay_order_info.status == 1:
+        logging.info('pay_order_info.status == 1')
         return target_wechat.dict_to_xml(result_data), header
 
     target_pay = PayService()
