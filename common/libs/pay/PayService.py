@@ -7,6 +7,7 @@ from common.models.pay.PayOrderCallbackData import PayOrderCallbackData
 from common.models.pay.PayOrderItem import PayOrderItem
 from common.libs.Helper import getCurrentDate
 from common.models.product import Product
+from common.models.customer import Customer
 from common.libs.product.ProductService import ProductService
 from common.libs.queue.queueService import QueueService
 from common.models.shop_sale_change_log import ShopSaleChangeLog
@@ -155,6 +156,47 @@ class PayService():
             "pay_order_id": pay_order_info.id
         })
 
+    def rechargeorderSuccess(self, member_id=-1, pay_order_id = 0,params =None):
+        try:
+            pay_order_info = PayOrder.query.filter_by(id =pay_order_id).first()
+            if not pay_order_info or pay_order_info.status not in [11]:
+                return True
+
+            pay_order_info.pay_sn = params['pay_sn']
+            pay_order_info.status = 12
+            pay_order_info.express_status = 12
+            pay_order_info.updated_time = getCurrentDate()
+            pay_order_info.pay_time = getCurrentDate()
+            db.session.add(pay_order_info)
+
+            Customer_info = Customer.query.filter_by(Cid =member_id).first()
+            money = Customer_info.MyBalance
+            money += pay_order_info.total_price
+            Customer_info.MyBalance = money
+            db.session.add(Customer_info)
+
+            # 充值记录
+            pay_order_items = PayOrderItem.query.filter_by(pay_order_id=pay_order_id).all()
+            for order_item in pay_order_items:
+                tmp_model_sale_log = ShopSaleChangeLog()
+                tmp_model_sale_log.Pid = 100000
+                tmp_model_sale_log.quantity = 1
+                tmp_model_sale_log.price = order_item.price
+                tmp_model_sale_log.member_id = order_item.member_id
+                tmp_model_sale_log.created_time = getCurrentDate()
+
+                db.session.add(tmp_model_sale_log)
+
+            db.session.commit()
+        except Exception as e:
+            print(e)
+            db.session.rollback()
+            return False
+
+        QueueService.addQueue("pay", {
+            "Cid": pay_order_info.member_id,
+            "pay_order_id": pay_order_info.id
+        })
 
     def addPayCallbackData(self, pay_order_id=0, type ='pay', data=''):
         model_paycallback = PayOrderCallbackData()

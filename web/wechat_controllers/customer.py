@@ -279,52 +279,52 @@ def recharge():
 
     return jsonify(resp)
 
-# @route_wechat.route("/recharge_callback/", methods=["POST"])
-# def recharge_callback():
-#     # logging.info('进入回调函数')
-#     result_data = {
-#         'return_code': 'SUCCESS',
-#         'return_msg': 'OK'
-#     }
-#
-#     header = {'Content-Type':'application/xml'}
-#     config_mina = app.config['MINA_APP']
-#
-#     # logging.info(request.data)
-#
-#     target_wechat = WeChatService(merchant_key=config_mina['paykey'])
-#     # print(request.data)
-#
-#     callback_data = target_wechat.xml_to_dict(request.data)
-#
-#     sign = callback_data['sign']
-#     callback_data.pop('sign')
-#     gene_sign = target_wechat.create_sign(callback_data)
-#
-#     if sign != gene_sign:
-#         # logging.info('sing!=gene_sign')
-#         result_data['return_code'] = result_data['return_msg'] = "FAIL"
-#         return target_wechat.dict_to_xml(result_data), header
-#
-#     order_sn = callback_data['out_trade_no']
-#     pay_order_info = PayOrder.query.filter_by(order_sn=order_sn).first()
-#     if not pay_order_info:
-#         # logging.info('not pay_order_info')
-#         result_data['return_code'] = result_data['return_msg'] = "FAIL"
-#         return target_wechat.dict_to_xml(result_data), header
-#
-#     # if int(pay_order_info.total_price * 100) == int(callback_data['total_fee']):
-#     #     result_data['return_code'] = result_data['return_msg'] = "FAIL"
-#     #     return target_wechat.dict_to_xml(result_data), header
-#
-#     if pay_order_info.status == 1:
-#         # logging.info('pay_order_info.status == 1')
-#         return target_wechat.dict_to_xml(result_data), header
-#
-#     target_pay = PayService()
-#     target_pay.orderSuccess(pay_order_info.id, params={'pay_sn': callback_data['transaction_id']})
-#
-#     # 微信回调加入日志
-#     target_pay.addPayCallbackData(pay_order_id=pay_order_info.id, data=request.data)
-#
-#     return target_wechat.dict_to_xml(result_data), header
+@route_wechat.route("/recharge_callback/", methods=["POST"])
+def recharge_callback():
+    # logging.info('进入回调函数')
+    result_data = {
+        'return_code': 'SUCCESS',
+        'return_msg': 'OK'
+    }
+
+    header = {'Content-Type':'application/xml'}
+    config_mina = app.config['MINA_APP']
+
+    # logging.info(request.data)
+
+    target_wechat = WeChatService(merchant_key=config_mina['paykey'])
+    # print(request.data)
+
+    callback_data = target_wechat.xml_to_dict(request.data)
+
+    sign = callback_data['sign']
+    callback_data.pop('sign')
+    gene_sign = target_wechat.create_sign(callback_data)
+
+    if sign != gene_sign:
+        # logging.info('sing!=gene_sign')
+        result_data['return_code'] = result_data['return_msg'] = "FAIL"
+        return target_wechat.dict_to_xml(result_data), header
+
+    order_sn = callback_data['out_trade_no']
+    pay_order_info = PayOrder.query.filter_by(order_sn=order_sn).first()
+    if not pay_order_info:
+        # logging.info('not pay_order_info')
+        result_data['return_code'] = result_data['return_msg'] = "FAIL"
+        return target_wechat.dict_to_xml(result_data), header
+
+    # if int(pay_order_info.total_price * 100) == int(callback_data['total_fee']):
+    #     result_data['return_code'] = result_data['return_msg'] = "FAIL"
+    #     return target_wechat.dict_to_xml(result_data), header
+
+    if pay_order_info.status == 12:
+        # logging.info('pay_order_info.status == 1')
+        return target_wechat.dict_to_xml(result_data), header
+
+    target_pay = PayService()
+    target_pay.rechargeorderSuccess(pay_order_info.member_id, pay_order_info.id, params={'pay_sn': callback_data['transaction_id']})
+
+    # # 微信回调加入日志
+    # target_pay.addPayCallbackData(pay_order_id=pay_order_info.id, data=request.data)
+
+    return target_wechat.dict_to_xml(result_data), header
