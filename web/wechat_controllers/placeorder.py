@@ -252,7 +252,7 @@ def pay():
 
     data = {
         'spbill_create_ip': '132.232.139.186',
-        'appid': config_mina['appid'],
+        'appId': config_mina['appid'],
         'mch_id': config_mina['mch_id'],
         'nonce_str': target_wechat.get_nonce_str(),
         'body': "购买",
