@@ -303,7 +303,7 @@ def callback():
     header = {'Content-Type':'application/xml'}
     config_mina = app.config['MINA_APP']
 
-    # logging.info(request.data)
+    logging.info(request.data)
 
     target_wechat = WeChatService(merchant_key=config_mina['paykey'])
     # print(request.data)
