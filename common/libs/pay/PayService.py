@@ -15,7 +15,7 @@ class PayService():
     def __init__(self):
         pass
 
-    def createOrder(self, Cid, Shopid, items =None, params=None):
+    def createOrder(self, Cid, Shopid, items=None, params=None, recharge=None):
         resp = {'code': 200, 'msg': "操作成功", 'data': {}}
 
         pay_price = decimal.Decimal(0.00)
@@ -26,7 +26,8 @@ class PayService():
                 continue_count += 1
                 continue
             pay_price = pay_price + decimal.Decimal(item['price']) * int(item['number'])
-            product_id.append(item['Pid'])
+            if recharge != 'recharge':
+                product_id.append(item['Pid'])
 
         if continue_count >= len(items):
             resp['code'] = -1
@@ -59,38 +60,47 @@ class PayService():
             model_pay_order.yun_price = yun_price
             model_pay_order.pay_price = pay_price
             # model_pay_order.note = note
-            model_pay_order.status = -8
-            model_pay_order.express_status = -8
+            if recharge != 'recharge':
+                model_pay_order.status = -8
+                model_pay_order.express_status = -8
+            else:
+                model_pay_order.status = 11
+                model_pay_order.express_status = 11
             model_pay_order.express_address_id = express_address_id
             model_pay_order.express_info = json.dumps(express_info)
             model_pay_order.updated_time = model_pay_order.created_time = getCurrentDate()
             db.session.add(model_pay_order)
 
+
+
             for item in items:
-                tmp_left_stock = tmp_product_stock_mapping[item['Pid']]
-                if decimal.Decimal(item['price']) < 0:
-                    continue
-                if int(item['number']) > int(tmp_left_stock):
-                    raise Exception("该商品剩余: %s" % (tmp_left_stock))
+                if recharge != 'recharge':
 
-                result = int(tmp_left_stock) - int(item['number'])
-                tmp_ret = Product.query.filter_by(Pid=item['Pid']).update({
-                    'ProductStock': int(result)
-                })
+                    tmp_left_stock = tmp_product_stock_mapping[item['Pid']]
+                    if decimal.Decimal(item['price']) < 0:
+                        continue
+                    if int(item['number']) > int(tmp_left_stock):
+                        raise Exception("该商品剩余: %s" % (tmp_left_stock))
 
-                if not tmp_ret:
-                    raise Exception("下单失败")
+                    result = int(tmp_left_stock) - int(item['number'])
+                    tmp_ret = Product.query.filter_by(Pid=item['Pid']).update({
+                        'ProductStock': int(result)
+                    })
 
-                tmp_pay_item = PayOrderItem()
-                tmp_pay_item.pay_order_id = model_pay_order.id
-                tmp_pay_item.member_id = Cid
-                tmp_pay_item.quantity = item['number']
-                tmp_pay_item.price = item['price']
-                tmp_pay_item.Pid = item['Pid']
-                # tmp_pay_item.note = note
-                tmp_pay_item.updated_time = tmp_pay_item.created_time = getCurrentDate()
-                ProductService.setStockChangeLog(item['Pid'], result)
-                db.session.add(tmp_pay_item)
+                    if not tmp_ret:
+                        raise Exception("下单失败")
+                    tmp_pay_item = PayOrderItem()
+                    tmp_pay_item.pay_order_id = model_pay_order.id
+                    tmp_pay_item.member_id = Cid
+                    tmp_pay_item.quantity = item['number']
+                    tmp_pay_item.price = item['price']
+                    tmp_pay_item.Pid = item['Pid']
+                    # tmp_pay_item.note = note
+                    tmp_pay_item.updated_time = tmp_pay_item.created_time = getCurrentDate()
+                    if recharge != 'recharge':
+                        ProductService.setStockChangeLog(item['Pid'], result)
+                    db.session.add(tmp_pay_item)
+
             # 提交事务
             db.session.commit()
             resp['data'] = {

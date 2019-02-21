@@ -4,9 +4,14 @@ from common.libs.Helper import getCurrentDate
 from common.models.apply import Apply, db
 from application import app, db
 from flask import request, jsonify
+import decimal
+import json
 from common.models.customer import Customer
 from common.models.customer_login import CustomerLogin
 from common.libs.member.MemberService import MemberService
+from common.libs.pay.PayService import PayService
+from common.models.pay.PayOrder import PayOrder
+from common.libs.pay.wechatService import WeChatService
 
 
 # 用户信息
@@ -123,6 +128,7 @@ def getopenid():
         return jsonify(result)
     openid = MemberService.getOpenId(code)
     result['openid'] = openid
+    print(openid)
     return jsonify(result)
 
 @route_wechat.route("/customeLogin/", methods=['POST'])
@@ -200,7 +206,75 @@ def customerinfo():
     }
     return jsonify(resp)
 
+@route_wechat.route("/recharge/", methods=["POST"])
+def recharge():
+    resp = {'code': 200, 'msg': "下单成功", 'data': {}}
+    req = request.values
 
+    recharge = req['recharge'] if 'recharge' in req and req['recharge'] else ''
+    Cid = int(req['Cid']) if 'Cid' in req and req['Cid'] else 0
+    Shopid = -200
+    trolley_result = -200
+    # OrderAddress = -200
+    # 只放金额
+    params_goods = req['params_goods'] if 'params_goods' in req else None
 
+    items = []
+    if params_goods:
+        items = json.loads(params_goods)
 
+    if len(items) < 1:
+        resp['code'] = -1
+        resp['msg'] = "没有金额"
+        return jsonify(resp)
 
+    target = PayService()
+
+    params = {}
+
+    resp = target.createOrder(Cid, Shopid, items, recharge=recharge, params=params)
+
+    # --------------------------------------------------------------------------------
+
+    order_sn = resp['data']['order_sn']
+    print(order_sn)
+    pay_order_info = PayOrder.query.filter_by(order_sn=order_sn).first()
+    if not pay_order_info:
+        resp['code'] = -1
+        resp['code'] = "系统繁忙"
+        return jsonify(resp)
+
+    oauth_bind_info = CustomerLogin.query.filter_by(Cid=Cid).first()
+    if not oauth_bind_info:
+        resp['code'] = -1
+        resp['code'] = "系统繁忙"
+        return jsonify(resp)
+
+    config_mina = app.config["MINA_APP"]
+    notify_url = app.config["APP"]["domain"] + config_mina['callback_url']
+    target_wechat =WeChatService(merchant_key=config_mina["paykey"])
+
+    data = {
+        'appid': config_mina['appid'],
+        'mch_id': config_mina['mch_id'],
+        'nonce_str': target_wechat.get_nonce_str(),
+        'body': "购买",
+        'out_trade_no': pay_order_info.order_sn,
+        'total_fee': int(pay_order_info.total_price * 100),
+        'spbill_create_ip': '132.232.139.186',
+        'notify_url': notify_url,
+        'trade_type':'JSAPI',
+        'openid': oauth_bind_info.openid
+
+    }
+
+    pay_info = target_wechat.get_pay_info(data)
+
+    # 保存prepay_id
+    pay_order_info.prepay_id = pay_info['prepay_id']
+    db.session.add(pay_order_info)
+    db.session.commit()
+
+    resp['data']['pay_info'] = pay_info
+
+    return jsonify(resp)
