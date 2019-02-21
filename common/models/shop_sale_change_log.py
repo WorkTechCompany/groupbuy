@@ -12,7 +12,7 @@ class ShopSaleChangeLog(db.Model):
     Pid = db.Column(db.Integer, nullable=False, index=True, server_default=db.FetchedValue())
     quantity = db.Column(db.Integer, nullable=False, server_default=db.FetchedValue())
     price = db.Column(db.Numeric(10, 2), nullable=False, server_default=db.FetchedValue())
-    Cid = db.Column(db.Integer, nullable=False, server_default=db.FetchedValue())
+    member_id = db.Column(db.Integer, nullable=False, server_default=db.FetchedValue())
     created_time = db.Column(db.DateTime, nullable=False, server_default=db.FetchedValue())
 
     # @property

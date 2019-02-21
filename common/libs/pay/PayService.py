@@ -129,18 +129,19 @@ class PayService():
                 tmp_model_sale_log.Pid = order_item.Pid
                 tmp_model_sale_log.quantity = order_item.quantity
                 tmp_model_sale_log.price = order_item.price
-                tmp_model_sale_log.Cid = order_item.Cid
+                tmp_model_sale_log.member_id = order_item.member_id
                 tmp_model_sale_log.created_time = getCurrentDate()
 
                 db.session.add(tmp_model_sale_log)
 
             db.session.commit()
         except Exception as e:
+            print(e)
             db.session.rollback()
             return False
 
         QueueService.addQueue("pay", {
-            "Cid": pay_order_info.Cid,
+            "Cid": pay_order_info.member_id,
             "pay_order_id": pay_order_info.id
         })
 
