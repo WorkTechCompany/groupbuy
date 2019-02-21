@@ -252,15 +252,15 @@ def pay():
 
     data = {
         'appid': config_mina['appid'],
-        'body': "购买",
         'mch_id': config_mina['mch_id'],
         'nonce_str': target_wechat.get_nonce_str(),
-        'notify_url': notify_url,
-        'openid': oauth_bind_info.openid,
+        'body': "购买",
         'out_trade_no': pay_order_info.order_sn,
-        'spbill_create_ip': '132.232.139.186',
         'total_fee': int(pay_order_info.total_price * 100),
-        'trade_type':'JSAPI'
+        'spbill_create_ip': '132.232.139.186',
+        'notify_url': notify_url,
+        'trade_type':'JSAPI',
+        'openid': oauth_bind_info.openid
 
     }
 
