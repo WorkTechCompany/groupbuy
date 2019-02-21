@@ -41,14 +41,14 @@ class WeChatService():
             prepay_id = self.xml_to_dict(r.text).get('prepay_id')
 
             pay_sign_data = {
-                'response': response,
                 'appId': pay_data.get('appid'),
-                'timeStamp': int(time.time()),
                 'nonceStr': pay_data.get('nonce_str'),
+                'response': response,
+                'signType': 'MD5',
+                'timeStamp': int(time.time()),
                 'package': 'prepay_id={0}'.format(prepay_id),
-                'signType': 'MD5'
             }
-            pay_sign = sign
+            pay_sign = self.create_sign(pay_sign_data)
             pay_sign_data.pop('appId')
             pay_sign_data['paySign'] = pay_sign
             pay_sign_data['prepay_id'] = prepay_id
