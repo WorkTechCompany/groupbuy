@@ -12,5 +12,6 @@ class CustomerLogin(db.Model):
     CustomerPayword = db.Column(db.String(36), nullable=False, server_default=db.FetchedValue())     # 支付密码
     Payword_salt = db.Column(db.String(36), nullable=False, server_default=db.FetchedValue())     # 支付密码随机密钥
     created_time = db.Column(db.DateTime, nullable=False, server_default=db.FetchedValue())
+    openid = db.Column(db.String(80), nullable=False, server_default=db.FetchedValue())
 
 
