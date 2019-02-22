@@ -11,6 +11,7 @@ from common.models.customer import Customer
 from common.libs.product.ProductService import ProductService
 from common.libs.queue.queueService import QueueService
 from common.models.shop_sale_change_log import ShopSaleChangeLog
+from common.models.Balacelog.Balancelog import Balancelog
 
 class PayService():
     def __init__(self):
@@ -145,6 +146,23 @@ class PayService():
 
                 db.session.add(tmp_model_sale_log)
 
+            # 流水记录
+            Balance_log = Balancelog()
+
+            Balance_log.BankCardNumber = -1000
+            Balance_log.Cid = PayOrder.member_id
+            Balance_log.Openingbank = -1000
+            Balance_log.balance = pay_order_info.total_price
+            Balance_log.operating = 2
+            Balance_log.status = 4
+            Balance_log.total_balance = pay_order_info.total_price
+            Balance_log.receipt_qrcode = pay_order_info.order_sn
+            Balancelog.freeze_balance = pay_order_info.total_price
+            Balance_log.Accountname = -1000
+            Balance_log.createtime = getCurrentDate()
+            Balance_log.updatetime = getCurrentDate()
+            db.session.add(Balance_log)
+
             db.session.commit()
         except Exception as e:
             print(e)
@@ -186,6 +204,24 @@ class PayService():
                 tmp_model_sale_log.created_time = getCurrentDate()
 
                 db.session.add(tmp_model_sale_log)
+
+            # 充值流水记录
+            # 流水记录
+            Balance_log = Balancelog()
+
+            Balance_log.BankCardNumber = -1000
+            Balance_log.Cid = PayOrder.member_id
+            Balance_log.Openingbank = -1000
+            Balance_log.balance = pay_order_info.total_price
+            Balance_log.operating = 2
+            Balance_log.status = 5
+            Balance_log.total_balance = pay_order_info.total_price
+            Balance_log.receipt_qrcode = pay_order_info.order_sn
+            Balancelog.freeze_balance = pay_order_info.total_price
+            Balance_log.Accountname = -1000
+            Balance_log.createtime = getCurrentDate()
+            Balance_log.updatetime = getCurrentDate()
+            db.session.add(Balance_log)
 
             db.session.commit()
         except Exception as e:

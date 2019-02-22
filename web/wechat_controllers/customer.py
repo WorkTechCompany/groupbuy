@@ -13,6 +13,7 @@ from common.libs.member.MemberService import MemberService
 from common.libs.pay.PayService import PayService
 from common.models.pay.PayOrder import PayOrder
 from common.libs.pay.wechatService import WeChatService
+from sqlalchemy import or_
 
 
 # 用户信息
@@ -350,7 +351,7 @@ def withdraw():
     Balance_log = Balancelog()
 
     Balance_log.BankCardNumber = BankCardNumber
-    Balance_log.Cid = Cid
+    Balance_log.Cid = Customer.member_id
     Balance_log.Openingbank = Openingbank
     Balance_log.balance = balance
     Balance_log.operating = 1
@@ -367,3 +368,44 @@ def withdraw():
 
     return jsonify(resp)
 
+@route_wechat.route("/withdrawlog/", methods=["POST"])
+def withdrawlog():
+
+    resp = {'code': 200, 'msg': '操作成功~', 'data': {}}
+    req = request.values
+
+    Cid = int(req['Cid']) if 'Cid' in req else -1
+    page = int(req['page']) if 'page' in req else 1
+
+    if page < 1:
+        page = 1
+
+    page_size = 10
+    offset = (page - 1) * page_size
+
+    if Cid == -1:
+        resp['code'] = '-1'
+        resp['msg'] = '用户错误'
+        return jsonify(resp)
+    else:
+        query = Balancelog.query.filter_by(Cid=Cid)
+
+    log_list = query.order_by(Balancelog.id.desc()).offset(offset).limit(page_size).all()
+    totalCount = query.count()
+
+    data_list = []
+    if log_list:
+        for item in log_list:
+            tmp_data = {
+                'receipt_qrcode': item.receipt_qrcode,
+                'Accountname': item.Accountname,
+                'BankCardNumber': item.BankCardNumber,
+                'status': item.status,
+                'Openingbank': "%s" % (item.Openingbank),
+                'balance': str(item.balance),
+                'updatetime': str(item.updatetime)
+            }
+            data_list.append(tmp_data)
+    resp['totalCount'] = totalCount
+    resp['data'] = data_list
+    return jsonify(resp)

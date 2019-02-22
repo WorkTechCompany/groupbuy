@@ -19,7 +19,7 @@ from logging.handlers import RotatingFileHandler
 #
 #
 #
-log_file = 'log.log'
+log_file = 'wechat.log'
 root_logging = logging.getLogger()
 root_logging.setLevel(logging.INFO)
 formatter = logging.Formatter('%(asctime)s [%(name)s:%(filename)s:%(lineno)d] [%(levelname)s]- %(message)s')
