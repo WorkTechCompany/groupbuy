@@ -213,7 +213,7 @@ class PayService():
             Balance_log.Cid = pay_order_info.member_id
             Balance_log.Openingbank = -1000
             Balance_log.balance = pay_order_info.total_price
-            Balance_log.operating = 2
+            Balance_log.operating = 3
             Balance_log.status = 5
             Balance_log.total_balance = pay_order_info.total_price
             Balance_log.receipt_qrcode = pay_order_info.order_sn
