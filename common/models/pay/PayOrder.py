@@ -24,6 +24,7 @@ class PayOrder(db.Model):
     express_status = db.Column(db.Integer, nullable=False, server_default=db.FetchedValue())
     express_address_id = db.Column(db.Integer, nullable=False, server_default=db.FetchedValue())
     # express_info = db.Column(db.String(100), nullable=False, server_default=db.FetchedValue())
+    tracking_number = db.Column(db.String(100), nullable=False, server_default=db.FetchedValue())
     comment_status = db.Column(db.Integer, nullable=False, server_default=db.FetchedValue())
     pay_time = db.Column(db.DateTime, nullable=False, server_default=db.FetchedValue())
     updated_time = db.Column(db.DateTime, nullable=False, server_default=db.FetchedValue())

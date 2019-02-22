@@ -4,10 +4,15 @@ from common.models.product import Product
 from common.libs.UrlManager import UrlManager
 from common.models.pay.PayOrder import PayOrder
 from common.models.pay.PayOrderItem import PayOrderItem
-from common.models.order import Order
+from common.models.Balacelog.Balancelog import Balancelog
+from common.models.shop import Shop
 from common.models.address import Address
+from common.models.apply import Apply
+from common.models.customer import Customer
+from common.libs.Helper import getCurrentDate
 from common.libs.Helper import getFormatDate
 from sqlalchemy import or_
+from common.libs.pay.PayService import PayService
 import os
 from application import app, db
 import time
@@ -194,6 +199,7 @@ def orderinfo():
                 'ProductImage': "%s" % (ProductInfo.ProductImage),
                 'OrderPrice': "%s" % (item.price),
                 'OrderTime': getFormatDate(item.updated_time),
+                'tracking_number': "%s" % (Pay_info.tracking_number),
                 'OrderStatus': int(Pay_info.status)
                 # 'OrderAddressInfo': address
             }
@@ -290,8 +296,64 @@ def ordersend():
     resp = {'code': 200, 'msg': '发货成功'}
 
     id = request.values['id'] if 'id' in request.values else -1
+    tracking_number = request.values['tracking_number'] if 'tracking_number' in request.values else -1
     result = PayOrder.query.filter_by(id=id).first()
     result.status = -6
+    result.tracking_number = tracking_number
+
+    db.session.commit()
+    response = jsonify(resp)
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    return response
+
+
+@route_account.route("/confirmreceipt/", methods=['POST'])
+def confirmreceipt():
+
+    # 确认收货
+    # 用户冻结金额清零
+    # 商户余额增加加入记录
+
+    resp = {'code': 200, 'msg': '确认收货成功'}
+
+    Oid = request.values['Oid'] if 'Oid' in request.values else -1
+    Shopid = request.values['Shopid'] if 'Shopid' in request.values else -1
+    # result = PayOrder.query.filter_by(id=id).first()
+    # result.status = -5
+
+    Pay_info = PayOrder.query.filter_by(id=Oid).first()
+    loginfo = Balancelog.query.filter_by(receipt_qrcode=Pay_info.order_sn).first()
+    Shop_info = Shop.query.filter_by(Shopid=Shopid).first()
+    Apply_info = Apply.query.filter_by(Aid=Shop_info.Aid).first()
+    # 商户Cid
+    Customer_info = Customer.query.filter_by(Cid=Apply_info.Cid).first()
+
+    # 用户冻结金额清零
+    freeze_balance = loginfo.freeze_balance
+    loginfo.freeze_balance = float(0)
+
+    mybalance = float(Customer_info.MyBalance)
+    result = float(freeze_balance)
+    mybalance = mybalance + result
+    Customer_info.MyBalance = mybalance
+
+    # 打款给商家记录
+    Balance_log = Balancelog()
+
+    Balance_log.BankCardNumber = -1000
+    Balance_log.Cid = Customer_info.Cid
+    Balance_log.Openingbank = -1000
+    Balance_log.balance = freeze_balance
+    Balance_log.operating = 4
+    Balance_log.status = 6
+    Balance_log.total_balance = freeze_balance
+    target_pay = PayService()
+    Balance_log.receipt_qrcode = target_pay.geneOrderSn()
+    Balancelog.freeze_balance = float(0)
+    Balance_log.Accountname = -1000
+    Balance_log.createtime = getCurrentDate()
+    Balance_log.updatetime = getCurrentDate()
+    db.session.add(Balance_log)
 
     db.session.commit()
     response = jsonify(resp)
