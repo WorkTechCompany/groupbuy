@@ -12,6 +12,7 @@ from common.libs.pay.wechatService import WeChatService
 from common.models.customer_login import CustomerLogin
 from common.models.Balacelog.Balancelog import Balancelog
 # from common.libs.cart.cartService import CartService
+from common.models.shop_sale_change_log import ShopSaleChangeLog
 from common.models.shop import Shop
 from common.models.apply import Apply
 from common.models.customer import Customer
@@ -244,6 +245,85 @@ def orderCreate():
                     db.session.commit()
     return jsonify(resp)
 
+@route_wechat.route("/balancepay/", methods=["POST"])
+def balancepay():
+
+    # 余额支付
+    # 通过订单查询价格
+    # 扣除余额
+
+    resp = {'code': 200, 'msg': "操作成功", 'data': {}}
+    req = request.values
+    id = req['id'] if 'id' in req else ''
+    order_sn = req['order_sn'] if 'order_sn' in req else ''
+    Cid = req['Cid'] if 'Cid' in req else ''
+
+    pay_order_info = PayOrder.query.filter_by(order_sn=order_sn).first()
+    if not pay_order_info:
+        resp['code'] = -1
+        resp['code'] = "系统繁忙"
+        return jsonify(resp)
+
+    oauth_bind_info = CustomerLogin.query.filter_by(Cid=Cid).first()
+    if not oauth_bind_info:
+        resp['code'] = -1
+        resp['code'] = "系统繁忙"
+        return jsonify(resp)
+
+    pay_order_info = PayOrder.query.filter_by(order_sn=order_sn).first()
+    if not pay_order_info or pay_order_info.status not in [-8, -7]:
+        resp['code'] = -1
+        resp['code'] = "已支付"
+        return jsonify(resp)
+
+    # 更改订单状态
+    pay_order_info.status = 1
+    pay_order_info.express_status = -7
+    pay_order_info.updated_time = getCurrentDate()
+    pay_order_info.pay_time = getCurrentDate()
+    db.session.add(pay_order_info)
+
+    # 扣除余额
+    info = Customer.query.filter_by(Cid=Cid).first()
+    mybalance = float(info.MyBalance)
+    result = float(pay_order_info.total_price)
+    mybalance = mybalance - result
+    info.MyBalance = mybalance
+    db.session.add(info)
+
+    # 售卖记录
+    pay_order_items = PayOrderItem.query.filter_by(id=id).all()
+    for order_item in pay_order_items:
+        tmp_model_sale_log = ShopSaleChangeLog()
+        tmp_model_sale_log.Pid = order_item.Pid
+        tmp_model_sale_log.quantity = order_item.quantity
+        tmp_model_sale_log.price = order_item.price
+        tmp_model_sale_log.member_id = order_item.member_id
+        tmp_model_sale_log.created_time = getCurrentDate()
+
+        db.session.add(tmp_model_sale_log)
+
+    # 流水记录
+    Balance_log = Balancelog()
+
+    Balance_log.BankCardNumber = -1000
+    Balance_log.Cid = pay_order_info.member_id
+    Balance_log.Openingbank = -1000
+    Balance_log.balance = pay_order_info.total_price
+    Balance_log.operating = 2
+    Balance_log.status = 4
+    Balance_log.total_balance = pay_order_info.total_price
+    Balance_log.receipt_qrcode = pay_order_info.order_sn
+    Balance_log.freeze_balance = pay_order_info.total_price
+    Balance_log.Accountname = -1000
+    Balance_log.createtime = getCurrentDate()
+    Balance_log.updatetime = getCurrentDate()
+    db.session.add(Balance_log)
+
+    db.session.commit()
+    return jsonify(resp)
+
+
 @route_wechat.route("/pay/", methods=["POST"])
 def pay():
 
@@ -426,6 +506,7 @@ def confirmorder():
 @route_wechat.route("/confirmreceipt/", methods=['POST'])
 def confirmreceipt():
 
+
     # 确认收货
     # 用户冻结金额清零
     # 商户余额增加加入记录
@@ -434,10 +515,10 @@ def confirmreceipt():
 
     Oid = request.values['Oid'] if 'Oid' in request.values else -1
     Shopid = request.values['Shopid'] if 'Shopid' in request.values else -1
-    # result = PayOrder.query.filter_by(id=id).first()
-    # result.status = -5
 
-    loginfo = Balancelog.query.filter_by(Oid=Oid).first()
+    Pay_info = PayOrder.query.filter_by(id=Oid).first()
+    Pay_info.status = -5
+    loginfo = Balancelog.query.filter_by(receipt_qrcode=Pay_info.order_sn).first()
     Shop_info = Shop.query.filter_by(Shopid=Shopid).first()
     Apply_info = Apply.query.filter_by(Aid=Shop_info.Aid).first()
     # 商户Cid

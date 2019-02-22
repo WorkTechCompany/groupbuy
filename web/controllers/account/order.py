@@ -311,6 +311,7 @@ def ordersend():
 def confirmreceipt():
 
     # 确认收货
+    # 增加销量
     # 用户冻结金额清零
     # 商户余额增加加入记录
 
@@ -318,10 +319,9 @@ def confirmreceipt():
 
     Oid = request.values['Oid'] if 'Oid' in request.values else -1
     Shopid = request.values['Shopid'] if 'Shopid' in request.values else -1
-    # result = PayOrder.query.filter_by(id=id).first()
-    # result.status = -5
 
     Pay_info = PayOrder.query.filter_by(id=Oid).first()
+    Pay_info.status = -5
     loginfo = Balancelog.query.filter_by(receipt_qrcode=Pay_info.order_sn).first()
     Shop_info = Shop.query.filter_by(Shopid=Shopid).first()
     Apply_info = Apply.query.filter_by(Aid=Shop_info.Aid).first()
@@ -336,6 +336,9 @@ def confirmreceipt():
     result = float(freeze_balance)
     mybalance = mybalance + result
     Customer_info.MyBalance = mybalance
+
+    # 销量增加
+
 
     # 打款给商家记录
     Balance_log = Balancelog()
