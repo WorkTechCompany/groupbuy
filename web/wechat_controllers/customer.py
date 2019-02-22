@@ -336,9 +336,9 @@ def withdraw():
     req = request.values
 
     Cid = int(req['Cid']) if 'Cid' in req and req['Cid'] else 0
-    BankCardNumber = int(req['BankCardNumber']) if 'BankCardNumber' in req and req['BankCardNumber'] else 0
-    Openingbank = int(req['Openingbank']) if 'Openingbank' in req and req['Openingbank'] else 0
-    Accountname = int(req['Accountname']) if 'Accountname' in req and req['Accountname'] else 0
+    BankCardNumber = req['BankCardNumber'] if 'BankCardNumber' in req and req['BankCardNumber'] else 0
+    Openingbank = req['Openingbank'] if 'Openingbank' in req and req['Openingbank'] else 0
+    Accountname = req['Accountname'] if 'Accountname' in req and req['Accountname'] else 0
     balance = req['balance'] if 'balance' in req and req['balance'] else 0
 
     info = Customer.query.filter_by(Cid=Cid).first()
@@ -351,7 +351,7 @@ def withdraw():
     Balance_log = Balancelog()
 
     Balance_log.BankCardNumber = BankCardNumber
-    Balance_log.Cid = Customer.member_id
+    Balance_log.Cid = Customer.Cid
     Balance_log.Openingbank = Openingbank
     Balance_log.balance = balance
     Balance_log.operating = 1
