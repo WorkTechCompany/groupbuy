@@ -43,6 +43,13 @@ def showorder():
     page = int(req['page']) if 'page' in req else 1
     OrderStatus = int(req['OrderStatus']) if 'OrderStatus' in req else -1
 
+    if Cid == -1:
+        resp['code'] = -1
+        resp['msg'] = '账户错误'
+        response = jsonify(resp)
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        return response
+
     if page < 1:
         page = 1
 

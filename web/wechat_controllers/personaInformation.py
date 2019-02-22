@@ -61,6 +61,31 @@ def apply():
     return jsonify(resp)
 
 # 申请商户
+@route_wechat.route("/showapply/", methods=['POST'])
+def showapply():
+    resp = {'code': 200, 'msg': '查询成功'}
+    req = request.values
+    Cid = req['Cid']
+    result = Apply.query.filter_by(Cid=Cid).first()
+    check = int(result.ApplyStatus)
+    if check == 1:
+        tmp_data = {
+            'Aid': result.Aid,
+            'IDCard': result.IDCard,
+            'ApplyPhone': result.ApplyPhone,
+            'ApplyProvince': str(result.ApplyProvince),
+            'ApplyCity': str(result.ApplyCity),
+            'ApplyCounty': str(result.ApplyCounty),
+            'ApplyDetails': str(result.ApplyDetails)
+        }
+        resp['data'] = tmp_data
+        return jsonify(resp)
+    else:
+        resp['code'] = -1
+        resp['msg'] = '暂未成为团长'
+        return jsonify(resp)
+
+# 申请商户
 @route_wechat.route("/checkapply/", methods=['POST'])
 def checkapply():
 

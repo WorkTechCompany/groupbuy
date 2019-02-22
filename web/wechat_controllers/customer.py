@@ -342,8 +342,14 @@ def withdraw():
     balance = req['balance'] if 'balance' in req and req['balance'] else 0
 
     info = Customer.query.filter_by(Cid=Cid).first()
+
     mybalance = float(info.MyBalance)
     result = float(balance)
+    if mybalance < result:
+        resp['code'] = -1
+        resp['msg'] = '余额不足'
+        return jsonify(resp)
+
     mybalance = mybalance - result
     info.MyBalance = mybalance
     db.session.add(info)

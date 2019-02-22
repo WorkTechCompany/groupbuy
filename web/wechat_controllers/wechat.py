@@ -3,6 +3,7 @@ from common.models.product import Product
 from sqlalchemy import or_
 from web.wechat_controllers import route_wechat
 from common.models.shop import Shop
+from common.models.pay.PayOrderItem import PayOrderItem
 import json
 
 @route_wechat.route("/home/", methods=['GET', 'POST'])
@@ -70,6 +71,11 @@ def productInfo():
             'ShopCountry': ShopInfo.ShopCountry,
         }
         shop_info.append(shop)
+        # customer_list = []
+        # order_list = []
+        # pay_order_items = PayOrderItem.query.filter_by(Pid=Pid).all()
+        # for item in pay_order_items:
+        #     order_list.append(item)
         tmp_data = {
             'Pid': productinfo.Pid,
             'Aid': productinfo.Aid,
@@ -81,6 +87,7 @@ def productInfo():
             'ProductStock': int(productinfo.ProductStock),
             'ProductImage': str(productinfo.ProductImage),
             'ProductSold': str(productinfo.ProductSold)
+            # 'ProductBayCustomer': customer_list
         }
         resp['data'] = tmp_data
     return jsonify(resp)
