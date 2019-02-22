@@ -1,6 +1,7 @@
 from web.controllers.account import route_account
 from flask import jsonify, request
 from common.models.apply import Apply
+from common.models.images import Images
 from common.models.customer import Customer
 from common.libs.UrlManager import UrlManager
 from sqlalchemy import or_
@@ -91,3 +92,46 @@ def edditstatus():
     db.session.commit()
     return jsonify(resp)
 
+
+@route_account.route("/addimages/", methods=["POST"])
+def addimages():
+    resp = {'code': 200, 'msg': '操作成功'}
+
+    req = request.values
+    images = req['images'] if 'images' in req else ''
+    info = req['info'] if 'info' in req else ''
+
+    result = Images.query.filter_by(id=1).first()
+    if result:
+        pass
+    else:
+        result = Images()
+
+    result.images = images
+    result.info = info
+    db.session.add(result)
+    db.session.commit()
+
+    response = jsonify(resp)
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    return response
+
+@route_account.route("/showimages/", methods=["POST"])
+def showimages():
+    resp = {'code': 200, 'msg':'操作成功'}
+
+    images_list = Images.query.filter_by(id=1).first()
+    if images_list:
+
+        resp['images_list'] = images_list.images
+        resp['info'] = images_list.info
+        response = jsonify(resp)
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        return response
+
+    else:
+        resp['code'] = -1
+        resp['msg'] = '暂无数据'
+        response = jsonify(resp)
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        return response

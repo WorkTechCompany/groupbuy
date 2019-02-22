@@ -3,6 +3,7 @@ from common.models.product import Product
 from sqlalchemy import or_
 from web.wechat_controllers import route_wechat
 from common.models.shop import Shop
+from common.models.images import Images
 from common.models.pay.PayOrderItem import PayOrderItem
 import json
 
@@ -91,3 +92,24 @@ def productInfo():
         }
         resp['data'] = tmp_data
     return jsonify(resp)
+
+
+@route_wechat.route("/showimages/", methods=["POST"])
+def showimages():
+    resp = {'code': 200, 'msg': '操作成功'}
+
+    images_list = Images.query.filter_by(id=1).first()
+    if images_list:
+
+        resp['images_list'] = images_list.images
+        resp['info'] = images_list.info
+        response = jsonify(resp)
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        return response
+
+    else:
+        resp['code'] = -1
+        resp['msg'] = '暂无数据'
+        response = jsonify(resp)
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        return response
