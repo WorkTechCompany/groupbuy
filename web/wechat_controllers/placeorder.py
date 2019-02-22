@@ -92,8 +92,8 @@ def showorder():
                     'OrderPrice': str(info.price),
                     'total_price': str(item.total_price),
                     'OrderTime': str(item.updated_time),
-                    'OrderStatus': str(item.status)
-                    # 'OrderExpress': str(item.OrderExpress)
+                    'OrderStatus': str(item.status),
+                    'tracking_number': str(item.tracking_number)
                 }
                 data_list.append(tmp_data)
             o_list.append(data_list)
@@ -141,7 +141,8 @@ def orderinfo():
                 'ProductImage': "%s" % (ProductInfo.ProductImage),
                 'OrderPrice': "%s" % (item.price),
                 'OrderTime': getFormatDate(item.updated_time),
-                'OrderStatus': int(Pay_info.status)
+                'OrderStatus': int(Pay_info.status),
+                'tracking_number': str(Pay_info.tracking_number)
                 # 'OrderAddressInfo': address
             }
             data_list.append(tmp_data)
