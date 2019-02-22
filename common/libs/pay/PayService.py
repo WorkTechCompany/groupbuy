@@ -210,7 +210,7 @@ class PayService():
             Balance_log = Balancelog()
 
             Balance_log.BankCardNumber = -1000
-            Balance_log.Cid = PayOrder.member_id
+            Balance_log.Cid = pay_order_info.member_id
             Balance_log.Openingbank = -1000
             Balance_log.balance = pay_order_info.total_price
             Balance_log.operating = 2
