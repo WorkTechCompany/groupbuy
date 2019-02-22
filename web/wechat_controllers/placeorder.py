@@ -273,9 +273,8 @@ def pay():
         'total_fee': int(pay_order_info.total_price * 100),
         'spbill_create_ip': '132.232.139.186',
         'notify_url': notify_url,
-        'trade_type':'JSAPI',
+        'trade_type': 'JSAPI',
         'openid': oauth_bind_info.openid
-
     }
 
     logging.info(data)
