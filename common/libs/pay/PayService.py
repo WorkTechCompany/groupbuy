@@ -157,7 +157,7 @@ class PayService():
             Balance_log.status = 4
             Balance_log.total_balance = pay_order_info.total_price
             Balance_log.receipt_qrcode = pay_order_info.order_sn
-            Balancelog.freeze_balance = pay_order_info.total_price
+            Balance_log.freeze_balance = pay_order_info.total_price
             Balance_log.Accountname = -1000
             Balance_log.createtime = getCurrentDate()
             Balance_log.updatetime = getCurrentDate()
