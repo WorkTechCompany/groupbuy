@@ -83,6 +83,7 @@ def showorder():
                     # 'OrderFormat': str(item.OrderFormat),
                     'ProductImage': str(Product_info.ProductImage),
                     'OrderPrice': str(info.price),
+                    'total_price': str(item.total_price),
                     'OrderTime': str(item.updated_time),
                     'OrderStatus': str(item.status)
                     # 'OrderExpress': str(item.OrderExpress)
@@ -274,6 +275,14 @@ def balancepay():
     if not pay_order_info or pay_order_info.status not in [-8, -7]:
         resp['code'] = -1
         resp['code'] = "已支付"
+        return jsonify(resp)
+
+    Customer_info = Customer.query.filter_by(Cid=Cid).first()
+    pay_price = float(pay_order_info.total_price)
+    MyBalance = float(Customer_info.MyBalance)
+    if pay_price > MyBalance:
+        resp['code'] = -1
+        resp['code'] = "余额不足"
         return jsonify(resp)
 
     # 更改订单状态
@@ -488,6 +497,14 @@ def deleteorder():
     result = PayOrder.query.filter_by(id=id).first()
     result.status = 0
 
+    # 返回库存
+    pay_order_item_info = PayOrderItem.query.filter_by(pay_order_id=result.id).all()
+    for item in pay_order_item_info:
+        product_info = Product.query.filter_by(Pid=item.Pid).first()
+        stock = int(product_info.ProductStock)
+        stock_result = stock + int(item.quantity)
+        product_info.ProductStock = stock_result
+
     db.session.commit()
     return jsonify(resp)
 
@@ -532,6 +549,14 @@ def confirmreceipt():
     result = float(freeze_balance)
     mybalance = mybalance + result
     Customer_info.MyBalance = mybalance
+
+    # 销量增加
+    pay_order_item_info = PayOrderItem.query.filter_by(pay_order_id=Pay_info.id).all()
+    for item in pay_order_item_info:
+        product_info = Product.query.filter_by(Pid=item.Pid).first()
+        sold = int(product_info.ProductSold)
+        sold_result = sold + item.quantity
+        product_info.ProductSold = sold_result
 
     # 打款给商家记录
     Balance_log = Balancelog()

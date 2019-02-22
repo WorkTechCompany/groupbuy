@@ -276,6 +276,14 @@ def order_refund():
     result = PayOrder.query.filter_by(id=id).first()
     result.status = 0
 
+    # 返回库存
+    pay_order_item_info = PayOrderItem.query.filter_by(pay_order_id=result.id).all()
+    for item in pay_order_item_info:
+        product_info = Product.query.filter_by(Pid=item.Pid).first()
+        stock = int(product_info.ProductStock)
+        stock_result = stock + int(item.quantity)
+        product_info.ProductStock = stock_result
+
     db.session.commit()
     response = jsonify(resp)
     response.headers['Access-Control-Allow-Origin'] = '*'
@@ -338,7 +346,12 @@ def confirmreceipt():
     Customer_info.MyBalance = mybalance
 
     # 销量增加
-
+    pay_order_item_info = PayOrderItem.query.filter_by(pay_order_id=Pay_info.id).all()
+    for item in pay_order_item_info:
+        product_info = Product.query.filter_by(Pid=item.Pid).first()
+        sold = int(product_info.ProductSold)
+        sold_result = sold + item.quantity
+        product_info.ProductSold = sold_result
 
     # 打款给商家记录
     Balance_log = Balancelog()
