@@ -351,10 +351,10 @@ def withdraw():
     Balance_log = Balancelog()
 
     Balance_log.BankCardNumber = BankCardNumber
-    Balance_log.Cid = Customer.Cid
+    Balance_log.Cid = Cid
     Balance_log.Openingbank = Openingbank
     Balance_log.balance = balance
-    Balance_log.operating = 1
+    Balance_log.operating = 3
     Balance_log.status = 1
     Balance_log.total_balance = -1000
     target_pay = PayService()
