@@ -40,8 +40,8 @@ MINA_APP = {
     'paykey': 'TM8KwVFRlp0hsTWMQTxLplfFIzmk7csr',
     # 'mch_id': '1513434041',  # 公司
     'mch_id': '1471175702',
-    'callback_url': '/wechat/callback/',
-    'recharge_callback_url': '/wechat/recharge_callback/'
+    'callback_url': '/api/wechat/callback/',
+    'recharge_callback_url': '/api/wechat/recharge_callback/'
 }
 
 PAY_STATUS_DISPLAY_MAPPING = {
