@@ -224,7 +224,7 @@ def orderCreate():
         return jsonify(resp)
 
     address_info = Address.query.filter_by(Id=OrderAddress).first()
-    if not address_info or not address_info.Status:
+    if not address_info:
         resp['code'] = -1
         resp['msg'] = "下单失败：快递地址不对~~"
         return jsonify(resp)
